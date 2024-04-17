@@ -2,6 +2,8 @@ package Screens;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -15,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class Menu extends Game {
+public class Menu extends ScreenAdapter {
 	SpriteBatch batch;
 	Texture logo;
 	Texture background;
@@ -25,11 +27,14 @@ public class Menu extends Game {
 	Button btnShop;
 	Button btnExit;
 	Stage stage;
+	Game game;
 
 
-
+	public Menu(Game game) {
+		this.game = game;
+	}
 	@Override
-	public void create() {
+	public void show(){
 		float oW = 210;
 		float oH = 90;
 		float screenWidth = Gdx.graphics.getWidth();
@@ -85,7 +90,7 @@ public class Menu extends Game {
 
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				Gdx.app.log("Button Click", "Play button clicked!");
+				game.setScreen(new TrackSelection(game));
 			}
 		});
 
@@ -128,7 +133,7 @@ public class Menu extends Game {
 
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				Gdx.app.log("Button Click", "Play button clicked!");
+
 			}
 		});
 
@@ -148,7 +153,7 @@ public class Menu extends Game {
 	}
 
 	@Override
-	public void render() {
+	public void render(float delta) {
 		ScreenUtils.clear(1, 0, 0, 1);
 
 		float screenWidth = Gdx.graphics.getWidth();
