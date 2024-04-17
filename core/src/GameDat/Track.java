@@ -11,7 +11,7 @@ public class Track {
     private String difficulty;
     private String songFilePath;
 
-    public Track(String songName, String artistName, String coverImagePath, int difficulty, String songFilePath) {
+    public Track(String songName, String artistName, int difficulty, String coverImagePath,  String songFilePath) {
         this.songName = songName;
         this.artistName = artistName;
         this.coverImagePath = coverImagePath;
@@ -28,7 +28,6 @@ public class Track {
         }
         this.songFilePath=songFilePath;
     }
-
     public String getSongName() {
         return songName;
     }

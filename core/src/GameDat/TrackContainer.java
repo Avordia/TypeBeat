@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 public class TrackContainer extends Image {
 
     private Texture coverImage;
+    public static final float CONTAINER_WIDTH = 200f;
 
     public TrackContainer(Track track) {
         super(new Texture(track.getCoverImagePath())); // Set a default black image
