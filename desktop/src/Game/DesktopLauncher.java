@@ -1,6 +1,6 @@
 package Game;
 
-import com.badlogic.gdx.Graphics;
+import Screens.Menu;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
@@ -13,6 +13,6 @@ public class DesktopLauncher {
 		config.setTitle("TypeBeat");
         config.setInitialBackgroundColor(Color.BLACK);
 		config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
-		new Lwjgl3Application(new TypeBeat(), config);
+		new Lwjgl3Application(new Menu(), config);
 	}
 }
