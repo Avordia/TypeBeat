@@ -18,6 +18,7 @@ public class TrackContainer extends Image {
         this.coverImage = new Texture(track.getCoverImagePath());
         setSize(200, 200);
         setPosition((float) Gdx.graphics.getWidth() /2, 50);
+
     }
 
     @Override

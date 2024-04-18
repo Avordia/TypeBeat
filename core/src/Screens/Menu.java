@@ -180,11 +180,17 @@ public class Menu extends ScreenAdapter {
 	}
 
 	@Override
+	public void hide() {
+		backgroundMusic.stop();
+	}
+
+	@Override
 	public void dispose() {
+		// Dispose of resources properly
+		backgroundMusic.dispose();
 		batch.dispose();
 		logo.dispose();
 		background.dispose();
-		backgroundMusic.dispose();
 		stage.dispose();
 	}
 }

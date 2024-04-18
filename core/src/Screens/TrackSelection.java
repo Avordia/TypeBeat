@@ -31,24 +31,91 @@ public class TrackSelection extends ScreenAdapter {
     private Game game;
     private Stage stage;
     private Texture background;
-
-    private Texture coverLeft;
-    private Texture coverCenter;
-    private Texture coverRight;
     private SpriteBatch batch;
     private ArrayList<Track> trackList;
-    private int selectedIndex=0;
-    private Music currentMusic;
+    private ArrayList<Music> trackMusicList;
     Button btnPrev;
     Button btnNext;
+    int l;
+    int c=0;
+    int r=1;
     private final int trackCount;
+    private Music currentMusic;
     public TrackSelection(Game game) { //Add tracks here
         this.game=game;
         trackList = new ArrayList<Track>();
-        trackList.add(new Track("Song1", "Artist1", 3, "bm/DragonBall.png", "Sound/bm/Track1.mp3"));
-        trackList.add(new Track("Song2", "Artist2", 1, "bm/Naruto.png", "Sound/bm/Track2.mp3"));
-        trackList.add(new Track("Song3", "Artist3", 2, "bm/Frieren.png", "Sound/bm/Track3.mp3"));
-        trackCount=trackList.size();
+        trackList.add(new Track("Song1", "Artist1", 3, "bm/DragonBall.png", "Sound/bm/Dragonball.mp3"));
+        trackList.add(new Track("Song2", "Artist2", 1, "bm/Naruto.png", "Sound/bm/Naruto.mp3"));
+        trackList.add(new Track("Song3", "Artist3", 2, "bm/Nora.png", "Sound/bm/Nora.mp3"));
+        trackList.add(new Track("Song4", "Artist4", 2, "bm/Oshi.png", "Sound/bm/Oshi.mp3"));
+        trackCount=trackList.size()-1;
+        l=trackCount;
+
+        trackMusicList = new ArrayList<Music>();
+        for (Track track : trackList) {
+            Music music = Gdx.audio.newMusic(Gdx.files.internal(track.getSongFilePath()));
+            trackMusicList.add(music);
+        }
+    }
+
+
+    private void playCenterMusic() {
+        if (c >= 0 && c < trackMusicList.size()) {
+            Music musicToPlay = trackMusicList.get(c);
+            if (currentMusic != null) {
+                currentMusic.stop();
+            }
+            currentMusic = musicToPlay;
+            currentMusic.play();
+        }
+    }
+
+
+    public void traverseRight() {
+        if(l+1>trackCount){
+            l=0;
+        }
+        else{
+            l++;
+        }
+
+        if(c+1>trackCount){
+            c=0;
+        }
+        else{
+            c++;
+        }
+
+        if(r+1>trackCount){
+            r=0;
+        }
+        else{
+            r++;
+        }
+    }
+
+    public void traverseLeft() {
+        if(l-1<0){
+            l=trackCount;
+        }
+        else{
+            l--;
+        }
+
+        if(c-1<0){
+            c=trackCount;
+        }
+        else{
+            c--;
+        }
+
+        if(r-1<0){
+            r=trackCount;
+        }
+        else{
+            r--;
+        }
+
     }
 
     @Override
@@ -57,9 +124,6 @@ public class TrackSelection extends ScreenAdapter {
         stage = new Stage();
 
         background = new Texture("Img/background2.png");
-        coverLeft = new Texture("");
-        coverCenter = new Texture("");
-        coverRight = new Texture("");
 
         btnPrev = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/prev.png"))));
         btnPrev.setSize(100,200);
@@ -74,6 +138,10 @@ public class TrackSelection extends ScreenAdapter {
 
         stage.addActor(btnPrev);
         stage.addActor(btnNext);
+        currentMusic=Gdx.audio.newMusic(Gdx.files.internal(trackList.get(c).getSongFilePath()));
+        currentMusic.setVolume(0.5f);
+        currentMusic.setLooping(true);
+        currentMusic.play();
 
         btnNext.addListener(new ClickListener() {
 
@@ -82,9 +150,11 @@ public class TrackSelection extends ScreenAdapter {
                 SequenceAction scaleAnim = Actions.sequence();
 
                 scaleAnim.addAction(Actions.sizeTo(100*1.15f,200*1.15f,0.1f,Interpolation.smooth));
+                traverseRight();
                 scaleAnim.addAction(Actions.sizeTo(100,200,0.1f,Interpolation.smooth));
                 btnNext.addAction(scaleAnim);
-                selectedIndex=(selectedIndex+1)%trackCount;
+                playCenterMusic();
+
             }
         });
 
@@ -94,9 +164,11 @@ public class TrackSelection extends ScreenAdapter {
                 SequenceAction scaleAnim = Actions.sequence();
 
                 scaleAnim.addAction(Actions.sizeTo(100*1.15f,200*1.15f,0.1f,Interpolation.smooth));
+                traverseLeft();
                 scaleAnim.addAction(Actions.sizeTo(100,200,0.1f,Interpolation.smooth));
                 btnPrev.addAction(scaleAnim);
-                selectedIndex=(selectedIndex+1)%trackCount;
+                playCenterMusic();
+
             }
         });
 
@@ -106,22 +178,27 @@ public class TrackSelection extends ScreenAdapter {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(1, 0, 0, 1);
-        float coverWidthH=400;
-        float coverHeightH=300;
-        float coverWidthS=250;
-        float coverHeightS=187.5f;
+
         batch.begin();
         batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        batch.draw(coverLeft,200, (float) Gdx.graphics.getHeight() /2 - coverHeightS/2,coverWidthS,coverHeightS);
-        batch.draw(coverCenter,(float)Gdx.graphics.getWidth()/2 - coverWidthH/2, (float) Gdx.graphics.getHeight() /2 - coverHeightH/2,coverWidthH,coverHeightH);
-        batch.draw(coverRight,(float)Gdx.graphics.getWidth()-(coverWidthS+200),(float) Gdx.graphics.getHeight() /2 - coverHeightS/2,coverWidthS,coverHeightS);
 
+        float coverWidthH = 400;
+        float coverHeightH = 300;
+
+        float coverWidthS = 250;
+        float coverHeightS = 187.5f;
+
+        batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(new Texture(trackList.get(l).getCoverImagePath()),200, (float) Gdx.graphics.getHeight() /2 - coverHeightS/2,coverWidthS,coverHeightS);
+        batch.draw(new Texture(trackList.get(c).getCoverImagePath()),(float)Gdx.graphics.getWidth()/2 - coverWidthH/2, (float) Gdx.graphics.getHeight() /2 - coverHeightH/2,coverWidthH,coverHeightH);
+        batch.draw(new Texture(trackList.get(r).getCoverImagePath()),(float)Gdx.graphics.getWidth()-(coverWidthS+200),(float) Gdx.graphics.getHeight() /2 - coverHeightS/2,coverWidthS,coverHeightS);
 
         batch.end();
 
-        stage.act((Gdx.graphics.getDeltaTime()));
+        stage.act(delta);
         stage.draw();
     }
+
 }
 
 
