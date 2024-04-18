@@ -13,6 +13,8 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.AddAction;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -44,8 +46,8 @@ public class TrackSelection extends ScreenAdapter {
         this.game=game;
         trackList = new ArrayList<Track>();
         trackList.add(new Track("Song1", "Artist1", 3, "bm/DragonBall.png", "Sound/bm/Track1.mp3"));
-        trackList.add(new Track("Song2", "Artist2", 3, "bm/DragonBall.png", "Sound/bm/Track2.mp3"));
-        trackList.add(new Track("Song3", "Artist3", 3, "bm/DragonBall.png", "Sound/bm/Track3.mp3"));
+        trackList.add(new Track("Song2", "Artist2", 1, "bm/Naruto.png", "Sound/bm/Track2.mp3"));
+        trackList.add(new Track("Song3", "Artist3", 2, "bm/Frieren.png", "Sound/bm/Track3.mp3"));
         trackCount=trackList.size();
     }
 
@@ -54,32 +56,46 @@ public class TrackSelection extends ScreenAdapter {
         batch = new SpriteBatch();
         stage = new Stage();
 
-        background = new Texture("bm/DragonBall.png");
+        background = new Texture("Img/background2.png");
+        coverLeft = new Texture("");
+        coverCenter = new Texture("");
+        coverRight = new Texture("");
 
-        Stage stage = new Stage();
-        btnPrev = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/next.png"))));
-        btnPrev.setPosition(10, Gdx.graphics.getHeight() / 2 - btnPrev.getHeight() / 2);
+        btnPrev = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/prev.png"))));
+        btnPrev.setSize(100,200);
 
-        btnNext = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/prev.png"))));
-        btnNext.setPosition(Gdx.graphics.getWidth() - 10, Gdx.graphics.getHeight() / 2 - btnPrev.getHeight() / 2);
+        btnNext = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/next.png"))));
+        btnNext.setSize(100,200);
+
+        btnPrev.setPosition(35, Gdx.graphics.getHeight() / 2 - btnPrev.getHeight() / 2);
+        btnNext.setPosition(Gdx.graphics.getWidth() - (btnNext.getWidth()+35), Gdx.graphics.getHeight() / 2 - btnPrev.getHeight() / 2);
+
 
 
         stage.addActor(btnPrev);
         stage.addActor(btnNext);
 
         btnNext.addListener(new ClickListener() {
-            @Override
-            public void enter(InputEvent event, float x, float y, int pointer, com.badlogic.gdx.scenes.scene2d.Actor fromActor) {
-                btnNext.addAction(Actions.sizeTo(100 * 1.2f, 200 * 1.2f, 0.2f, Interpolation.smooth));
-            }
-
-            @Override
-            public void exit(InputEvent event, float x, float y, int pointer, com.badlogic.gdx.scenes.scene2d.Actor toActor) {
-                btnNext.addAction(Actions.sizeTo(100, 200, 0.2f, Interpolation.smooth));
-            }
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                SequenceAction scaleAnim = Actions.sequence();
+
+                scaleAnim.addAction(Actions.sizeTo(100*1.15f,200*1.15f,0.1f,Interpolation.smooth));
+                scaleAnim.addAction(Actions.sizeTo(100,200,0.1f,Interpolation.smooth));
+                btnNext.addAction(scaleAnim);
+                selectedIndex=(selectedIndex+1)%trackCount;
+            }
+        });
+
+        btnPrev.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                SequenceAction scaleAnim = Actions.sequence();
+
+                scaleAnim.addAction(Actions.sizeTo(100*1.15f,200*1.15f,0.1f,Interpolation.smooth));
+                scaleAnim.addAction(Actions.sizeTo(100,200,0.1f,Interpolation.smooth));
+                btnPrev.addAction(scaleAnim);
                 selectedIndex=(selectedIndex+1)%trackCount;
             }
         });
@@ -90,9 +106,16 @@ public class TrackSelection extends ScreenAdapter {
     @Override
     public void render(float delta) {
         ScreenUtils.clear(1, 0, 0, 1);
-
+        float coverWidthH=400;
+        float coverHeightH=300;
+        float coverWidthS=250;
+        float coverHeightS=187.5f;
         batch.begin();
         batch.draw(background, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        batch.draw(coverLeft,200, (float) Gdx.graphics.getHeight() /2 - coverHeightS/2,coverWidthS,coverHeightS);
+        batch.draw(coverCenter,(float)Gdx.graphics.getWidth()/2 - coverWidthH/2, (float) Gdx.graphics.getHeight() /2 - coverHeightH/2,coverWidthH,coverHeightH);
+        batch.draw(coverRight,(float)Gdx.graphics.getWidth()-(coverWidthS+200),(float) Gdx.graphics.getHeight() /2 - coverHeightS/2,coverWidthS,coverHeightS);
+
 
         batch.end();
 
