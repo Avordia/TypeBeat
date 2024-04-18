@@ -4,8 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -16,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.AddAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
@@ -33,7 +32,6 @@ public class TrackSelection extends ScreenAdapter {
     private Texture background;
     private SpriteBatch batch;
     private ArrayList<Track> trackList;
-    private ArrayList<Music> trackMusicList;
     Button btnPrev;
     Button btnNext;
     int l;
@@ -41,6 +39,7 @@ public class TrackSelection extends ScreenAdapter {
     int r=1;
     private final int trackCount;
     private Music currentMusic;
+
     public TrackSelection(Game game) { //Add tracks here
         this.game=game;
         trackList = new ArrayList<Track>();
@@ -51,24 +50,18 @@ public class TrackSelection extends ScreenAdapter {
         trackCount=trackList.size()-1;
         l=trackCount;
 
-        trackMusicList = new ArrayList<Music>();
-        for (Track track : trackList) {
-            Music music = Gdx.audio.newMusic(Gdx.files.internal(track.getSongFilePath()));
-            trackMusicList.add(music);
-        }
     }
 
 
     private void playCenterMusic() {
-        if (c >= 0 && c < trackMusicList.size()) {
-            Music musicToPlay = trackMusicList.get(c);
-            if (currentMusic != null) {
-                currentMusic.stop();
-            }
-            currentMusic = musicToPlay;
-            currentMusic.play();
+        Music musicToPlay = Gdx.audio.newMusic(Gdx.files.internal(trackList.get(c).getSongFilePath()));
+        if (currentMusic != null) {
+            currentMusic.stop();
         }
+        currentMusic = musicToPlay;
+        currentMusic.play();
     }
+
 
 
     public void traverseRight() {
@@ -134,8 +127,6 @@ public class TrackSelection extends ScreenAdapter {
         btnPrev.setPosition(35, Gdx.graphics.getHeight() / 2 - btnPrev.getHeight() / 2);
         btnNext.setPosition(Gdx.graphics.getWidth() - (btnNext.getWidth()+35), Gdx.graphics.getHeight() / 2 - btnPrev.getHeight() / 2);
 
-
-
         stage.addActor(btnPrev);
         stage.addActor(btnNext);
         currentMusic=Gdx.audio.newMusic(Gdx.files.internal(trackList.get(c).getSongFilePath()));
@@ -168,10 +159,8 @@ public class TrackSelection extends ScreenAdapter {
                 scaleAnim.addAction(Actions.sizeTo(100,200,0.1f,Interpolation.smooth));
                 btnPrev.addAction(scaleAnim);
                 playCenterMusic();
-
             }
         });
-
         Gdx.input.setInputProcessor(stage);
     }
 
