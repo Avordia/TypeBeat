@@ -1,25 +1,20 @@
 package Behavior;
 
 public class Line {
-    private float x;
-    private float y;
-    private float speed;
+    private float x; // Left position of the line
+    private float speed; // Speed of the line
 
-    public Line(float x, float y, float speed) {
+    public Line(float x, float speed) {
         this.x = x;
-        this.y = y;
         this.speed = speed;
+    }
+
+    public void update(float delta) {
+        x += speed * delta;
     }
 
     public float getX() {
         return x;
     }
 
-    public float getY() {
-        return y;
-    }
-
-    public void update(float delta) {
-        x += speed * delta;
-    }
 }
