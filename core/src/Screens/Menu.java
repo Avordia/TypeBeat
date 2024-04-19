@@ -28,8 +28,6 @@ public class Menu extends ScreenAdapter {
 	Button btnExit;
 	Stage stage;
 	Game game;
-
-
 	public Menu(Game game) {
 		this.game = game;
 	}
@@ -91,6 +89,7 @@ public class Menu extends ScreenAdapter {
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
 				game.setScreen(new TrackSelection(game));
+				dispose();
 			}
 		});
 

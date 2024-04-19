@@ -10,8 +10,9 @@ public class Track {
     private String coverImagePath;
     private String difficulty;
     private String songFilePath;
+    private float bpm;
 
-    public Track(String songName, String artistName, int difficulty, String coverImagePath,  String songFilePath) {
+    public Track(String songName, String artistName, int difficulty, String coverImagePath,  String songFilePath, float bpm) {
         this.songName = songName;
         this.artistName = artistName;
         this.coverImagePath = coverImagePath;
@@ -46,5 +47,8 @@ public class Track {
 
     public String getSongFilePath() {
         return songFilePath;
+    }
+    public float getBpm(){
+        return bpm;
     }
 }

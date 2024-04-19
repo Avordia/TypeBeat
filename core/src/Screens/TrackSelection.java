@@ -11,16 +11,12 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.AddAction;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
 
 import GameDat.Track;
-import GameDat.TrackContainer;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
@@ -43,13 +39,12 @@ public class TrackSelection extends ScreenAdapter {
     public TrackSelection(Game game) { //Add tracks here
         this.game=game;
         trackList = new ArrayList<Track>();
-        trackList.add(new Track("Song1", "Artist1", 3, "bm/DragonBall.png", "Sound/bm/Dragonball.mp3"));
-        trackList.add(new Track("Song2", "Artist2", 1, "bm/Naruto.png", "Sound/bm/Naruto.mp3"));
-        trackList.add(new Track("Song3", "Artist3", 2, "bm/Nora.png", "Sound/bm/Nora.mp3"));
-        trackList.add(new Track("Song4", "Artist4", 2, "bm/Oshi.png", "Sound/bm/Oshi.mp3"));
+        trackList.add(new Track("Song1", "Artist1", 3, "bm/DragonBall.png", "Sound/bm/Dragonball.mp3",143));
+        trackList.add(new Track("Song2", "Artist2", 1, "bm/Naruto.png", "Sound/bm/Naruto.mp3",143));
+        trackList.add(new Track("Song3", "Artist3", 2, "bm/Nora.png", "Sound/bm/Nora.mp3",143));
+        trackList.add(new Track("Song4", "Artist4", 2, "bm/Oshi.png", "Sound/bm/Oshi.mp3",143));
         trackCount=trackList.size()-1;
         l=trackCount;
-
     }
 
 
@@ -57,12 +52,11 @@ public class TrackSelection extends ScreenAdapter {
         Music musicToPlay = Gdx.audio.newMusic(Gdx.files.internal(trackList.get(c).getSongFilePath()));
         if (currentMusic != null) {
             currentMusic.stop();
+            currentMusic.dispose();
         }
         currentMusic = musicToPlay;
         currentMusic.play();
     }
-
-
 
     public void traverseRight() {
         if(l+1>trackCount){
