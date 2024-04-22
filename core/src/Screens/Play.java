@@ -1,5 +1,6 @@
 package Screens;
 
+import Behavior.Line;
 import Behavior.RhythmGameLogic;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -9,30 +10,49 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 
+import java.util.ArrayList;
+
 public class Play extends ScreenAdapter {
     private Game game;
-    private Texture leftLineTexture;
-    private Texture rightLineTexture;
+    private Texture LineTexture;
     private SpriteBatch batch;
     private RhythmGameLogic gameLogic;
     private float elapsedTime;
-    private float leftLineX;
-    private float rightLineX;
+    private ArrayList<Line> leftLine;
+    private ArrayList<Line> rightLine;
     private float lineY;
+    private ArrayList<Float> beatTimes;
+    private int noteCount;
+
+    float screenWidth = Gdx.graphics.getWidth();
+    float screenHeight = Gdx.graphics.getHeight();
+    float centerY = screenWidth / 2;
+    float centerX = screenHeight/ 2;
 
     public Play(Game game) {
         this.game = game;
-        leftLineTexture = new Texture("Img/MapSprites/line.png");
-        rightLineTexture = new Texture("Img/MapSprites/line.png");
+        LineTexture = new Texture("Img/MapSprites/line.png");
+        beatTimes = new ArrayList<>();
+        beatTimes.add(1.0f);
+        beatTimes.add(2.0f);
+        beatTimes.add(3.0f);
+        beatTimes.add(3.5f);
+        beatTimes.add(4.0f);
+
+        leftLine = new ArrayList<>();
+        rightLine = new ArrayList<>();
+
         batch = new SpriteBatch();
         gameLogic = new RhythmGameLogic();
-        elapsedTime = 0f;
 
-        // Initialize initial positions of lines
         float screenWidth = Gdx.graphics.getWidth();
-        leftLineX = screenWidth / 4 - leftLineTexture.getWidth() / 2;
-        rightLineX = 3 * screenWidth / 4 - rightLineTexture.getWidth() / 2;
-        lineY = Gdx.graphics.getHeight() / 2 - leftLineTexture.getHeight() / 2; // Center vertically
+        noteCount= beatTimes.size();
+
+        for(int i=0; i<noteCount;i++){
+            float beat=beatTimes.get(i);
+            leftLine.add(new Line(beat,LineTexture, 0));
+            rightLine.add(new Line(beat,LineTexture, screenWidth+LineTexture.getWidth()));
+        }
     }
 
     @Override
@@ -42,57 +62,22 @@ public class Play extends ScreenAdapter {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        float screenWidth = Gdx.graphics.getWidth();
-        float centerScreenX = screenWidth / 2;
-
-        // Calculate target X positions towards the center of the screen
-        float targetLeftLineX = centerScreenX - leftLineTexture.getWidth() / 2;
-        float targetRightLineX = centerScreenX - rightLineTexture.getWidth() / 2;
-
-        // Interpolate current positions towards the target positions
-        float movementSpeed = 200f; // Adjust movement speed as needed
-        leftLineX = moveTowards(leftLineX, targetLeftLineX, movementSpeed * delta);
-        rightLineX = moveTowards(rightLineX, targetRightLineX, movementSpeed * delta);
-
         batch.begin();
-        batch.draw(leftLineTexture, leftLineX, lineY);
-        batch.draw(rightLineTexture, rightLineX, lineY);
-        batch.end();
-
-        // Check for player input
-        if (Gdx.input.justTouched()) {
-            Array<Float> beatTimes = gameLogic.getBeatTimes();
-            if (!beatTimes.isEmpty()) {
-                float nextBeatTime = beatTimes.first();
-                float timeThreshold = 0.2f; // Adjust threshold for input timing
-
-                // Check if player input matches the beat timing
-                if (Math.abs(elapsedTime - nextBeatTime) <= timeThreshold) {
-                    // Player input matched the beat
-                    System.out.println("Perfect!");
-                    beatTimes.removeIndex(0); // Remove the matched beat time
-                } else {
-                    // Player input missed the beat
-                    System.out.println("Missed!");
-                }
-            }
+        for (Line line : leftLine) {
+            line.updatePosition(elapsedTime, centerX);
+            batch.draw(line.getTexture(), line.getX(), line.getY());
         }
+        for (Line line : rightLine) {
+            line.updatePosition(elapsedTime, centerX);
+            batch.draw(line.getTexture(), line.getX(), line.getY());
+        }
+        batch.end();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
-        leftLineTexture.dispose();
-        rightLineTexture.dispose();
+        LineTexture.dispose();
     }
 
-    // Helper method to interpolate position towards a target position
-    private float moveTowards(float currentPos, float targetPos, float maxDistanceDelta) {
-        if (Math.abs(targetPos - currentPos) <= maxDistanceDelta) {
-            return targetPos;
-        } else {
-            float direction = Math.signum(targetPos - currentPos);
-            return currentPos + direction * maxDistanceDelta;
-        }
-    }
 }
