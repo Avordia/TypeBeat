@@ -53,4 +53,8 @@ public class Line extends InputAdapter {
     public float getBeatTime() {
         return beatTime;
     }
+
+    public float getSpawnTime(){
+        return spawnTime;
+    }
 }
