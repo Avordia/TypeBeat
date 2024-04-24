@@ -1,14 +1,10 @@
 package Screens;
 
 import Behavior.Line;
-import Behavior.RhythmGameLogic;
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
@@ -16,7 +12,6 @@ public class Play extends ScreenAdapter {
     private Game game;
     private Texture LineTexture;
     private SpriteBatch batch;
-    private RhythmGameLogic gameLogic;
     private float elapsedTime;
     private ArrayList<Line> leftLine;
     private ArrayList<Line> rightLine;
@@ -26,8 +21,8 @@ public class Play extends ScreenAdapter {
 
     float screenWidth = Gdx.graphics.getWidth();
     float screenHeight = Gdx.graphics.getHeight();
-    float centerY = screenWidth / 2;
-    float centerX = screenHeight/ 2;
+    float centerY = screenHeight / 2;
+    float centerX = screenWidth / 2;
 
     public Play(Game game) {
         this.game = game;
@@ -43,16 +38,28 @@ public class Play extends ScreenAdapter {
         rightLine = new ArrayList<>();
 
         batch = new SpriteBatch();
-        gameLogic = new RhythmGameLogic();
 
-        float screenWidth = Gdx.graphics.getWidth();
-        noteCount= beatTimes.size();
+        noteCount = beatTimes.size();
 
-        for(int i=0; i<noteCount;i++){
-            float beat=beatTimes.get(i);
-            leftLine.add(new Line(beat,LineTexture, 0));
-            rightLine.add(new Line(beat,LineTexture, screenWidth+LineTexture.getWidth()));
+        for (int i = 0; i < noteCount; i++) {
+            float beat = beatTimes.get(i);
+            leftLine.add(new Line(beat, LineTexture, 0));
+            rightLine.add(new Line(beat, LineTexture, screenWidth - LineTexture.getWidth()));
         }
+
+        // Add input processor to listen for key events
+        Gdx.input.setInputProcessor(new InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                if (keycode == Input.Keys.SPACE) {
+
+                    leftLine.remove(0);
+                    rightLine.remove(0);
+                    return true; // Input handled
+                }
+                return false; // Input not handled
+            }
+        });
     }
 
     @Override
@@ -63,6 +70,7 @@ public class Play extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
+
         for (Line line : leftLine) {
             line.updatePosition(elapsedTime, centerX);
             batch.draw(line.getTexture(), line.getX(), line.getY());
@@ -79,5 +87,4 @@ public class Play extends ScreenAdapter {
         batch.dispose();
         LineTexture.dispose();
     }
-
 }
