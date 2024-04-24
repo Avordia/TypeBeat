@@ -1,5 +1,6 @@
 package Screens;
 
+import Behavior.KeyHandling;
 import Behavior.Line;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
@@ -22,8 +23,8 @@ public class Play extends ScreenAdapter {
     private float screenHeight;
     private float targetX;
     private int noteCount;
-
     private int movingNotes=0;
+    private KeyHandling keyHandler;
 
     public Play(Game game) {
         this.game = game;
@@ -35,7 +36,6 @@ public class Play extends ScreenAdapter {
         beatTimes.add(3.0f);
         beatTimes.add(3.5f);
         beatTimes.add(7.0f);
-
         spawnTimes=new ArrayList<>();
         spawnTimes.add(0.0f);
         spawnTimes.add(0.0f);
@@ -51,6 +51,7 @@ public class Play extends ScreenAdapter {
 
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
+        keyHandler = new KeyHandling(leftLine, rightLine);
 
         float centerY = screenHeight / 2;
 
@@ -67,28 +68,13 @@ public class Play extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
+        Gdx.input.setInputProcessor(keyHandler);
         elapsedTime += delta;
 
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
-        Gdx.input.setInputProcessor(new InputAdapter() {
-            @Override
-            public boolean keyDown(int keycode) {
-                if (keycode == Input.Keys.SPACE) {
-                    // Remove the first line from both lists when spacebar is pressed
-                    if (!leftLine.isEmpty()) {
-                        leftLine.remove(0);
-                    }
-                    if (!rightLine.isEmpty()) {
-                        rightLine.remove(0);
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
         /* ------------------------------------------ LEFT SIDE ----------------------------------------- */
         for (int i = 0; i < leftLine.size(); i++) {
                 Line line = leftLine.get(i);
@@ -116,27 +102,24 @@ public class Play extends ScreenAdapter {
         for (int i = 0; i < rightLine.size(); i++) {
             Line line = rightLine.get(i);
             if (elapsedTime >= line.getSpawnTime()) {
-                float distanceToTravel = line.getX() - targetX; // Distance to center
+                float distanceToTravel = line.getX() - targetX;
 
-                // Calculate speed based on the time remaining until beatTime
                 float remainingTime = line.getBeatTime() - elapsedTime;
                 float speed = distanceToTravel / remainingTime;
 
                 batch.draw(line.getTexture(), line.getX(), line.getY());
-                line.setX(line.getX() - speed * delta); // Move towards the center
+                line.setX(line.getX() - speed * delta);
 
 
-                // Check if line has reached the center
                 if (line.getX() <= targetX) {
                     rightLine.remove(i);
-                    i--; // Decrement i to account for removed element
+                    i--;
                 }
             }
         }
 
         batch.end();
     }
-
 
     @Override
     public void dispose() {
