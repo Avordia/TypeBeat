@@ -21,7 +21,7 @@ public class Play extends ScreenAdapter {
 
     private float screenWidth;
     private float screenHeight;
-    private float targetX;
+    private float centerX;
     private int noteCount;
     private int movingNotes=0;
     private KeyHandling keyHandler;
@@ -62,7 +62,7 @@ public class Play extends ScreenAdapter {
             rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), LineTexture, spawnLocationR));
         }
 
-        targetX = screenWidth / 2;
+        centerX = screenWidth / 2;
 
     }
 
@@ -77,9 +77,9 @@ public class Play extends ScreenAdapter {
         batch.begin();
         /* ------------------------------------------ LEFT SIDE ----------------------------------------- */
         for (int i = 0; i < leftLine.size(); i++) {
-                Line line = leftLine.get(i);
+            Line line = leftLine.get(i);
             if (elapsedTime >= line.getSpawnTime()) {
-                float distanceToTravel = targetX - line.getX();
+                float distanceToTravel = centerX - line.getX();
 
                 float remainingTime = line.getBeatTime() - elapsedTime;
                 float speed = distanceToTravel / remainingTime;
@@ -88,7 +88,7 @@ public class Play extends ScreenAdapter {
                 line.setX(line.getX() + speed * delta);
                 movingNotes++;
 
-                if (line.getX() >= targetX) {
+                if (line.getX() >= centerX) {
                     leftLine.remove(i);
                     i--;
                     movingNotes--;
@@ -102,7 +102,7 @@ public class Play extends ScreenAdapter {
         for (int i = 0; i < rightLine.size(); i++) {
             Line line = rightLine.get(i);
             if (elapsedTime >= line.getSpawnTime()) {
-                float distanceToTravel = line.getX() - targetX;
+                float distanceToTravel = line.getX() - centerX;
 
                 float remainingTime = line.getBeatTime() - elapsedTime;
                 float speed = distanceToTravel / remainingTime;
@@ -111,7 +111,7 @@ public class Play extends ScreenAdapter {
                 line.setX(line.getX() - speed * delta);
 
 
-                if (line.getX() <= targetX) {
+                if (line.getX() <= centerX) {
                     rightLine.remove(i);
                     i--;
                 }
