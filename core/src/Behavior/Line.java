@@ -10,15 +10,16 @@ public class Line extends InputAdapter {
     private float beatTime;
     private float startX;
     private float x;
-
     private float y;
+    float spawnTime;
 
-    public Line(float beatTime, Texture texture, float startX) {
+    public Line(float spawnTime, float beatTime, Texture texture, float startX) {
         this.beatTime = beatTime;
         this.texture = texture;
         this.startX = startX;
         this.x = startX;
         this.y = Gdx.graphics.getHeight() * 0.1f;
+        this.spawnTime=spawnTime;
     }
 
     public void updatePosition(float elapsedTime, float targetX) {
@@ -42,8 +43,14 @@ public class Line extends InputAdapter {
         return x;
     }
 
+    public void setX(float x) {
+        this.x=x;
+    }
+
     public float getY() {
         return y;
     }
-
+    public float getBeatTime() {
+        return beatTime;
+    }
 }

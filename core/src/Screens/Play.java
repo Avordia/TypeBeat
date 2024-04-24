@@ -12,21 +12,21 @@ public class Play extends ScreenAdapter {
     private Game game;
     private Texture LineTexture;
     private SpriteBatch batch;
-    private float elapsedTime;
     private ArrayList<Line> leftLine;
     private ArrayList<Line> rightLine;
-    private float lineY;
     private ArrayList<Float> beatTimes;
-    private int noteCount;
+    private ArrayList<Float> spawnTimes;
+    private float elapsedTime;
 
-    float screenWidth = Gdx.graphics.getWidth();
-    float screenHeight = Gdx.graphics.getHeight();
-    float centerY = screenHeight / 2;
-    float centerX = screenWidth / 2;
+    private float screenWidth;
+    private float screenHeight;
+    private float targetX;
+    private int noteCount;
 
     public Play(Game game) {
         this.game = game;
         LineTexture = new Texture("Img/MapSprites/line.png");
+        batch = new SpriteBatch();
         beatTimes = new ArrayList<>();
         beatTimes.add(1.0f);
         beatTimes.add(2.0f);
@@ -34,30 +34,48 @@ public class Play extends ScreenAdapter {
         beatTimes.add(3.5f);
         beatTimes.add(4.0f);
 
+        spawnTimes=new ArrayList<>();
+        spawnTimes.add(0.0f);
+        spawnTimes.add(0.0f);
+        spawnTimes.add(0.0f);
+        spawnTimes.add(1.0f);
+        spawnTimes.add(3.0f);
+        spawnTimes.add(3.0f);
+
+        noteCount= beatTimes.size();
+
+
         leftLine = new ArrayList<>();
         rightLine = new ArrayList<>();
 
-        batch = new SpriteBatch();
+        screenWidth = Gdx.graphics.getWidth();
+        screenHeight = Gdx.graphics.getHeight();
 
-        noteCount = beatTimes.size();
+        float centerY = screenHeight / 2;
 
-        for (int i = 0; i < noteCount; i++) {
-            float beat = beatTimes.get(i);
-            leftLine.add(new Line(beat, LineTexture, 0));
-            rightLine.add(new Line(beat, LineTexture, screenWidth - LineTexture.getWidth()));
+        for(int i=0; i<noteCount;i++){
+            float spawnLocationL = -LineTexture.getWidth(); // Start off screen to the left
+            float spawnLocationR = screenWidth; // Start off screen to the right
+            leftLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), LineTexture, spawnLocationL));
+            rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), LineTexture, spawnLocationR));
         }
 
-        // Add input processor to listen for key events
+        targetX = screenWidth / 2;
+
         Gdx.input.setInputProcessor(new InputAdapter() {
             @Override
             public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.SPACE) {
-
-                    leftLine.remove(0);
-                    rightLine.remove(0);
-                    return true; // Input handled
+                    // Remove the first line from both lists when spacebar is pressed
+                    if (!leftLine.isEmpty()) {
+                        leftLine.remove(0);
+                    }
+                    if (!rightLine.isEmpty()) {
+                        rightLine.remove(0);
+                    }
+                    return true;
                 }
-                return false; // Input not handled
+                return false;
             }
         });
     }
@@ -71,16 +89,47 @@ public class Play extends ScreenAdapter {
 
         batch.begin();
 
-        for (Line line : leftLine) {
-            line.updatePosition(elapsedTime, centerX);
+        for (int i = 0; i < leftLine.size(); i++) {
+            Line line = leftLine.get(i);
+            float distanceToTravel = targetX - line.getX();
+
+            float remainingTime = line.getBeatTime() - elapsedTime;
+            float speed = distanceToTravel / remainingTime;
+
             batch.draw(line.getTexture(), line.getX(), line.getY());
+            line.setX(line.getX() + speed * delta);
+
+
+            // Check if line has reached the center
+            if (line.getX() >= targetX) {
+                leftLine.remove(i);
+                i--; // Decrement i to account for removed element
+            }
         }
-        for (Line line : rightLine) {
-            line.updatePosition(elapsedTime, centerX);
+
+        // Update and render right lines
+        for (int i = 0; i < rightLine.size(); i++) {
+            Line line = rightLine.get(i);
+            float distanceToTravel = line.getX() - targetX; // Distance to center
+
+            // Calculate speed based on the time remaining until beatTime
+            float remainingTime = line.getBeatTime() - elapsedTime;
+            float speed = distanceToTravel / remainingTime;
+
             batch.draw(line.getTexture(), line.getX(), line.getY());
+            line.setX(line.getX() - speed * delta); // Move towards the center
+
+
+            // Check if line has reached the center
+            if (line.getX() <= targetX) {
+                rightLine.remove(i);
+                i--; // Decrement i to account for removed element
+            }
         }
+
         batch.end();
     }
+
 
     @Override
     public void dispose() {
