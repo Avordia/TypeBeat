@@ -25,6 +25,9 @@ public class KeyHandling extends InputAdapter {
         return false;
     }
 
+
+    /*---------------------------FUNCTIONS------------------------------------------*/
+
     public void deleteLines() {
         if (!leftLine.isEmpty()) {
             leftLine.remove(0);
@@ -38,8 +41,6 @@ public class KeyHandling extends InputAdapter {
         float centerX = (float) Gdx.graphics.getWidth() / 2;
         float distanceToCenter = Math.abs(line.getX() - centerX);
         float spawnToCenterDistance = centerX;
-        return distanceToCenter <= spawnToCenterDistance / 2.2;
+        return distanceToCenter <= spawnToCenterDistance / 2.8;
     }
-
-
 }

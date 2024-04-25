@@ -37,7 +37,7 @@ public class Play extends ScreenAdapter {
         beatTimes.add(3.5f);
         beatTimes.add(7.0f);
         spawnTimes=new ArrayList<>();
-        spawnTimes.add(0.0f);
+        spawnTimes.add(0.5f);
         spawnTimes.add(0.0f);
         spawnTimes.add(0.0f);
         spawnTimes.add(1.0f);
