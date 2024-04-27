@@ -3,26 +3,39 @@ package Screens;
 import Behavior.KeyHandling;
 import Behavior.Line;
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.ArrayList;
 
 public class Play extends ScreenAdapter {
+
+    int dead=0;
+    int wordCount=0;
+    private BitmapFont font;
+    private GlyphLayout layout;
+    private ShapeRenderer shapeRenderer;
     private Game game;
-    private Texture LineTexture;
-    private SpriteBatch batch;
-    private ArrayList<Line> leftLine;
-    private ArrayList<Line> rightLine;
-    private ArrayList<Float> beatTimes;
+    private final Texture LineTexture;
+    private final SpriteBatch batch;
+    private final SpriteBatch textBatch;
+    private final ArrayList<Line> leftLine;
+    private final ArrayList<Line> rightLine;
+    private final ArrayList<Float> beatTimes;
     private ArrayList<Float> spawnTimes;
-    private ArrayList<Character> letter;
+    private final ArrayList<Character> letterList;
+    private final ArrayList<String> wordList;
     private float elapsedTime;
 
-    private float screenWidth;
-    private float screenHeight;
+    private final float screenWidth;
+    private final float screenHeight;
     private float centerX;
+    private float centerY;
     private int noteCount;
     private int movingNotes=0;
     private KeyHandling keyHandler;
@@ -31,6 +44,7 @@ public class Play extends ScreenAdapter {
         this.game = game;
         LineTexture = new Texture("Img/MapSprites/line1.png");
         batch = new SpriteBatch();
+        textBatch = new SpriteBatch();
         beatTimes = new ArrayList<>();
         beatTimes.add(1.0f);
         beatTimes.add(2.0f);
@@ -51,16 +65,48 @@ public class Play extends ScreenAdapter {
         spawnTimes.add(5.0f);
         spawnTimes.add(6.0f);
         spawnTimes.add(6.0f);
-        letter=new ArrayList<>();
-        letter.add('T');
-        letter.add('Y');
-        letter.add('P');
-        letter.add('E');
-        letter.add('/');
-        letter.add('B');
-        letter.add('E');
-        letter.add('A');
-        letter.add('T');
+        letterList=new ArrayList<>();
+        letterList.add('T');
+        letterList.add('Y');
+        letterList.add('P');
+        letterList.add('E');
+        letterList.add('/');
+        letterList.add('B');
+        letterList.add('E');
+        letterList.add('A');
+        letterList.add('T');
+
+        wordList=new ArrayList<>();
+
+        StringBuilder currentString = new StringBuilder();
+
+        for (int i = 0; i < letterList.size(); i++) {
+            char ch = letterList.get(i);
+
+            if (ch == '/') {
+                // Check if next character is also '/' and currentString is not empty
+                if (i + 1 < letterList.size() && letterList.get(i + 1) == '/') {
+                    // Add current '/' as a string to wordList
+                    wordList.add("/");
+                    // Move to next character
+                    i++;
+                } else {
+                    // Add currentString to wordList if not empty
+                    if (currentString.length() > 0) {
+                        wordList.add(currentString.toString());
+                        currentString.setLength(0); // Clear currentString
+                    }
+                }
+            } else {
+                // Append character to currentString
+                currentString.append(ch);
+            }
+        }
+
+        // Add the last accumulated currentString if not empty
+        if (currentString.length() > 0) {
+            wordList.add(currentString.toString());
+        }
 
         noteCount= beatTimes.size();
 
@@ -69,26 +115,29 @@ public class Play extends ScreenAdapter {
 
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
-        keyHandler = new KeyHandling(leftLine, rightLine);
+        keyHandler = new KeyHandling(leftLine, rightLine,dead);
 
         float centerY = screenHeight / 2;
-
         for(int i=0; i<noteCount;i++){
             float spawnLocationL = -LineTexture.getWidth();
             float spawnLocationR = screenWidth;
-            leftLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letter.get(i), spawnLocationL));
-            rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letter.get(i), spawnLocationR));
+            leftLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationL));
+            rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationR));
         }
 
-        centerX = screenWidth / 2;
+        centerX = screenWidth/2;
+        centerY = screenHeight/2;
+
+        font = new BitmapFont();
+        layout = new GlyphLayout();
+        shapeRenderer = new ShapeRenderer();
 
     }
-
     @Override
     public void render(float delta) {
         Gdx.input.setInputProcessor(keyHandler);
         elapsedTime += delta;
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
@@ -106,16 +155,17 @@ public class Play extends ScreenAdapter {
                 movingNotes++;
 
                 if (line.getX() >= centerX) {
+                    if (leftLine.get(0).getLineType()==2) {
+                        wordCount++;
+                    }
+                    dead++;
                     leftLine.remove(i);
                     i--;
                     movingNotes--;
                 }
             }
         }
-
         /* ------------------------------------------ RIGHT SIDE ----------------------------------------- */
-
-        // Update and render right lines
         for (int i = 0; i < rightLine.size(); i++) {
             Line line = rightLine.get(i);
             if (elapsedTime >= line.getSpawnTime()) {
@@ -135,6 +185,23 @@ public class Play extends ScreenAdapter {
         }
 
         batch.end();
+
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.BLACK);
+        float rectWidth = 200;
+        float rectHeight = 100;
+        float rectX = (screenWidth - rectWidth) / 2;
+        float rectY = (screenHeight - rectHeight) / 2;
+        shapeRenderer.rect(rectX, rectY, rectWidth, rectHeight);
+        shapeRenderer.end();
+
+        textBatch.begin();
+
+        font.setColor(Color.RED);
+        int drawIndex = Math.min(wordCount, wordList.size() - 1);
+        font.draw(textBatch, wordList.get(drawIndex), 100, 100);
+
+        textBatch.end();
     }
 
     @Override

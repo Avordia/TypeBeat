@@ -8,16 +8,18 @@ import java.util.ArrayList;
 public class KeyHandling extends InputAdapter {
     private ArrayList<Line> leftLine;
     private ArrayList<Line> rightLine;
+    float dead;
 
-    public KeyHandling(ArrayList<Line> leftLine, ArrayList<Line> rightLine) {
+    public KeyHandling(ArrayList<Line> leftLine, ArrayList<Line> rightLine, float dead) {
         this.leftLine = leftLine;
         this.rightLine = rightLine;
+        this.dead=dead;
     }
 
     @Override
     public boolean keyDown(int keycode) {
         if (keycode == Input.Keys.SPACE) {
-            if(isLineCloseToCenter(leftLine.get(0))) {
+            if (isLineCloseToCenter(leftLine.get(0))) {
                 deleteLines();
                 return true;
             }
@@ -33,6 +35,7 @@ public class KeyHandling extends InputAdapter {
         if (!rightLine.isEmpty()) {
             rightLine.remove(0);
         }
+        dead++;
     }
 
     private boolean isLineCloseToCenter(Line line) {
@@ -41,4 +44,5 @@ public class KeyHandling extends InputAdapter {
         float spawnToCenterDistance = centerX;
         return distanceToCenter <= spawnToCenterDistance / 2.8;
     }
+
 }

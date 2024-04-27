@@ -14,6 +14,7 @@ public class Line extends InputAdapter {
     private float x;
     private float y;
     float spawnTime;
+    int lineType;
 
     public Line(float spawnTime, float beatTime, char letter, float startX) {
         this.beatTime = beatTime;
@@ -24,9 +25,11 @@ public class Line extends InputAdapter {
 
         if(letter=='/'){
             this.texture=new Texture(type2);
+            this.lineType=2;
         }
         else{
             this.texture=new Texture(type1);
+            this.lineType=1;
         }
     }
 
@@ -64,5 +67,9 @@ public class Line extends InputAdapter {
 
     public float getSpawnTime(){
         return spawnTime;
+    }
+
+    public int getLineType() {
+        return lineType;
     }
 }
