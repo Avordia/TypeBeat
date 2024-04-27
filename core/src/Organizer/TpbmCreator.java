@@ -6,7 +6,6 @@ import java.util.zip.*;
 public class TpbmCreator {
 
     public static void createTpbmArchive(String musicFilePath, String photoFilePath, List<Float> spawnTimes, List<Float> beatTimes, String outputFilePath) throws IOException {
-        // Create a ZIP archive for the .tpbm file
         try (FileOutputStream fos = new FileOutputStream(outputFilePath);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
 

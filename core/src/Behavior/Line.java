@@ -7,19 +7,27 @@ import com.badlogic.gdx.graphics.Texture;
 
 public class Line extends InputAdapter {
     private Texture texture;
+    private String type1="Img/MapSprites/line1.png";
+    private String type2="Img/MapSprites/line2.png";
     private float beatTime;
     private float startX;
     private float x;
     private float y;
     float spawnTime;
 
-    public Line(float spawnTime, float beatTime, Texture texture, float startX) {
+    public Line(float spawnTime, float beatTime, char letter, float startX) {
         this.beatTime = beatTime;
-        this.texture = texture;
         this.startX = startX;
         this.x = startX;
         this.y = Gdx.graphics.getHeight() * 0.1f;
         this.spawnTime=spawnTime;
+
+        if(letter=='/'){
+            this.texture=new Texture(type2);
+        }
+        else{
+            this.texture=new Texture(type1);
+        }
     }
 
     public void updatePosition(float elapsedTime, float targetX) {

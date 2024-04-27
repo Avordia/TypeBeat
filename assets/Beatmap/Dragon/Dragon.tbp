@@ -1,0 +1,7 @@
+musicPath: audio.mp3
+imagePath: background.png
+
+Time:
+beattime, spawntime
+0.5, 1.0
+1.0, 2.0

@@ -24,8 +24,6 @@ public class KeyHandling extends InputAdapter {
         }
         return false;
     }
-
-
     /*---------------------------FUNCTIONS------------------------------------------*/
 
     public void deleteLines() {
