@@ -14,6 +14,7 @@ public class Line extends InputAdapter {
     private float y;
     float spawnTime;
     int lineType;
+    char letter;
 
     public Line(float spawnTime, float beatTime, char letter, float startX) {
         this.beatTime = beatTime;
@@ -21,6 +22,7 @@ public class Line extends InputAdapter {
         this.x = startX;
         this.y = Gdx.graphics.getHeight() * 0.1f;
         this.spawnTime=spawnTime;
+        this.letter=letter;
 
         if(letter=='/' || letter=='*'){
             this.texture=new Texture(type2);
@@ -70,5 +72,9 @@ public class Line extends InputAdapter {
 
     public int getLineType() {
         return lineType;
+    }
+
+    public char getLetter() {
+        return letter;
     }
 }
