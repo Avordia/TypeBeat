@@ -1,7 +1,6 @@
 package Behavior;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Texture;
 
@@ -23,7 +22,7 @@ public class Line extends InputAdapter {
         this.y = Gdx.graphics.getHeight() * 0.1f;
         this.spawnTime=spawnTime;
 
-        if(letter=='/'){
+        if(letter=='/' || letter=='*'){
             this.texture=new Texture(type2);
             this.lineType=2;
         }
