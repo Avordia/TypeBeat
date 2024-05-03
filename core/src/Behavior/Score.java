@@ -24,7 +24,7 @@ public class Score {
     }
 
     public void setScore(float score) {
-        this.score = score;
+        this.score=this.score+score;
     }
 
     public void incrementCombo(){
