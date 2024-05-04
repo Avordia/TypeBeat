@@ -56,7 +56,17 @@ public class Play extends ScreenAdapter {
     private final KeyHandling keyHandler;
     Score score;
     Sound sound;
-    public Play(Game game) {
+    private AssetManager assetManager;
+    public Play(Game game, AssetManager assetManager) {
+
+        this.assetManager = assetManager;
+
+        // Retrieve assets from AssetManager
+        backgroundMusic = assetManager.get("assets/Beatmap/Idol/audio.ogg", Music.class);
+        kick = assetManager.get("assets/Sound/type1.wav", Sound.class);
+        snare = assetManager.get("assets/Sound/type2.wav", Sound.class);
+        lineTexture = assetManager.get("Img/MapSprites/line1.png", Texture.class);
+
         this.game = game;
         screenWidth = Gdx.graphics.getWidth();
         screenHeight = Gdx.graphics.getHeight();
@@ -70,7 +80,6 @@ public class Play extends ScreenAdapter {
         String backgroundPath = beatmapData.getBackgroundPath();
         List<TBPFileReader.BeatData> beatDataList = beatmapData.getBeatDataList();
 
-        lineTexture = new Texture("Img/MapSprites/line1.png");
         beatTimes = new ArrayList<>();
         spawnTimes=new ArrayList<>();
         letterList=new ArrayList<>();
@@ -164,6 +173,7 @@ public class Play extends ScreenAdapter {
         }
         backgroundMusic.play();
     }
+
     @Override
     public void render(float delta) {
         Gdx.input.setInputProcessor(keyHandler);
