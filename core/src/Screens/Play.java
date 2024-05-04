@@ -86,8 +86,8 @@ public class Play extends ScreenAdapter {
         letterList=new ArrayList<>();
 
         for (TBPFileReader.BeatData beatData : beatDataList) {
-            float spawnTime = beatData.getSpawnTime()+2.55f; //Callibrators
-            float beatTime = beatData.getBeatTime()+2.55f; //Callibrators
+            float spawnTime = beatData.getSpawnTime()+2.378f; //Callibrators
+            float beatTime = beatData.getBeatTime()+2.378f; //Callibrators
             char letter = beatData.getLetter();
 
             beatTimes.add(beatTime);
@@ -248,8 +248,8 @@ public class Play extends ScreenAdapter {
         float rectX = (screenWidth - rectWidth) / 2;
         float rectY = (screenHeight - rectHeight) / 2;
         shapeRenderer.rect(rectX, rectY, rectWidth, rectHeight);
-        shapeRenderer.rect(0,0,screenWidth,100);
-        shapeRenderer.rect(0,screenHeight-100,screenWidth,100);
+        shapeRenderer.rect(0,0,screenWidth,250);
+        shapeRenderer.rect(0,screenHeight-250,screenWidth,250);
         shapeRenderer.rect(0,0,40,screenHeight);
         shapeRenderer.rect(screenWidth-40,0,40,screenHeight);
 
