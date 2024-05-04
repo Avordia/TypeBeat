@@ -145,8 +145,8 @@ public class KeyHandling extends InputAdapter {
     public int judgeTiming(Line line) {
         float timing = calculateTiming(line);
 
-        float perfectThreshold = centerX / 20;
-        float greatThreshold = centerX / 12;
+        float perfectThreshold = centerX / 10;
+        float greatThreshold = centerX / 7;
         float goodThreshold = centerX / 6;
 
         // Determine the judgment based on the calculated timing

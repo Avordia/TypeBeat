@@ -21,6 +21,7 @@ import java.util.List;
 
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
+
 public class Play extends ScreenAdapter {
     private Sound kick;
     private Sound snare;
@@ -57,11 +58,11 @@ public class Play extends ScreenAdapter {
     Score score;
     Sound sound;
     private AssetManager assetManager;
+
     public Play(Game game, AssetManager assetManager) {
 
         this.assetManager = assetManager;
 
-        // Retrieve assets from AssetManager
         backgroundMusic = assetManager.get("assets/Beatmap/Idol/audio.ogg", Music.class);
         kick = assetManager.get("assets/Sound/type1.wav", Sound.class);
         snare = assetManager.get("assets/Sound/type2.wav", Sound.class);
@@ -85,14 +86,15 @@ public class Play extends ScreenAdapter {
         letterList=new ArrayList<>();
 
         for (TBPFileReader.BeatData beatData : beatDataList) {
-            float spawnTime = beatData.getSpawnTime();
-            float beatTime = beatData.getBeatTime();
+            float spawnTime = beatData.getSpawnTime()+2.55f; //Callibrators
+            float beatTime = beatData.getBeatTime()+2.55f; //Callibrators
             char letter = beatData.getLetter();
 
             beatTimes.add(beatTime);
             spawnTimes.add(spawnTime);
             letterList.add(letter);
         }
+        spawnTimes.set(0,1.4f);
 
         wordList=new ArrayList<>();
         /*-------------------STRING BUILDER------------------------*/
@@ -171,16 +173,18 @@ public class Play extends ScreenAdapter {
             leftLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationL));
             rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationR));
         }
-        backgroundMusic.play();
     }
 
     @Override
     public void render(float delta) {
         Gdx.input.setInputProcessor(keyHandler);
         elapsedTime += delta;
-        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+        Gdx.gl.glClearColor(0.5f, 0.2f, 0.6f, 0.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        if(elapsedTime>=2.2f){
+            backgroundMusic.play();
+        }
         backgroundBatch.begin();
         backgroundBatch.end();
 
@@ -249,6 +253,9 @@ public class Play extends ScreenAdapter {
         shapeRenderer.rect(0,0,40,screenHeight);
         shapeRenderer.rect(screenWidth-40,0,40,screenHeight);
 
+        float centerRectWidth=10;
+        float centerRectHeight=1000;
+        shapeRenderer.rect((screenWidth/2)-centerRectWidth,0,centerRectWidth,centerRectHeight);
 
         shapeRenderer.end();
 
