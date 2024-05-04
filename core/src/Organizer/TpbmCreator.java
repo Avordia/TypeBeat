@@ -9,13 +9,10 @@ public class TpbmCreator {
         try (FileOutputStream fos = new FileOutputStream(outputFilePath);
              ZipOutputStream zos = new ZipOutputStream(fos)) {
 
-            // Add music file to the archive
             addFileToZip(musicFilePath, "music.mp3", zos);
 
-            // Add photo file to the archive
             addFileToZip(photoFilePath, "photo.png", zos);
 
-            // Create and add metadata (.tbp) file to the archive
             String tbpContent = generateTbpContent(spawnTimes, beatTimes, "music.mp3", "photo.png");
             addStringToZip(tbpContent, "metadata.tbp", zos);
         }

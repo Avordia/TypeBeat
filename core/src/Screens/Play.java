@@ -3,8 +3,10 @@ package Screens;
 import Behavior.KeyHandling;
 import Behavior.Line;
 import Behavior.Score;
+import Parser.TBPFileReader;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -12,11 +14,17 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class Play extends ScreenAdapter {
     private Sound kick;
     private Sound snare;
+    private Music backgroundMusic;
     private BitmapFont lblText;
     private BitmapFont lblScore;
     private BitmapFont lblCombo;
@@ -25,8 +33,8 @@ public class Play extends ScreenAdapter {
     private ShapeRenderer shapeAccentColor;
     private ShapeRenderer background;
     private Game game;
-    private final Texture LineTexture;
-    private Texture gifTexture;
+    private final Texture lineTexture;
+    private Texture backgroundPicture;
     private SpriteBatch lineBatch;
     private SpriteBatch textBatch;
     private SpriteBatch backgroundBatch;
@@ -37,7 +45,7 @@ public class Play extends ScreenAdapter {
     private ArrayList<Float> spawnTimes;
     private final ArrayList<Character> letterList;
     private ArrayList<String> wordList;
-    private ArrayList<Boolean> isDead;
+    private ArrayList<Integer> isDead;
     private float elapsedTime;
 
     private final float screenWidth;
@@ -45,46 +53,39 @@ public class Play extends ScreenAdapter {
     private float centerX;
     private float centerY;
     private final int noteCount;
-    private int movingNotes=0;
     private final KeyHandling keyHandler;
     Score score;
     Sound sound;
     public Play(Game game) {
         this.game = game;
-        LineTexture = new Texture("Img/MapSprites/line1.png");
+        screenWidth = Gdx.graphics.getWidth();
+        screenHeight = Gdx.graphics.getHeight();
+        float centerY = screenHeight / 2;
+        centerX = screenWidth/2;
+
+        String tbpFilePath = "assets/Beatmap/Idol/dragon.tbp";
+        TBPFileReader.BeatmapData beatmapData = TBPFileReader.readTBPFile(tbpFilePath);
+
+        String audioPath = beatmapData.getAudioPath();
+        String backgroundPath = beatmapData.getBackgroundPath();
+        List<TBPFileReader.BeatData> beatDataList = beatmapData.getBeatDataList();
+
+        lineTexture = new Texture("Img/MapSprites/line1.png");
         beatTimes = new ArrayList<>();
-        beatTimes.add(1.0f);
-        beatTimes.add(2.0f);
-        beatTimes.add(3.0f);
-        beatTimes.add(4.0f);
-        beatTimes.add(5.0f);
-        beatTimes.add(6.0f);
-        beatTimes.add(7.0f);
-        beatTimes.add(8.0f);
-        beatTimes.add(9.0f);
         spawnTimes=new ArrayList<>();
-        spawnTimes.add(0.5f);
-        spawnTimes.add(0.5f);
-        spawnTimes.add(0.5f);
-        spawnTimes.add(1.0f);
-        spawnTimes.add(1.0f);
-        spawnTimes.add(5.0f);
-        spawnTimes.add(5.0f);
-        spawnTimes.add(6.0f);
-        spawnTimes.add(6.0f);
         letterList=new ArrayList<>();
-        letterList.add('T');
-        letterList.add('Y');
-        letterList.add('P');
-        letterList.add('E');
-        letterList.add('/');
-        letterList.add('*');
-        letterList.add('*');
-        letterList.add('A');
-        letterList.add('T');
+
+        for (TBPFileReader.BeatData beatData : beatDataList) {
+            float spawnTime = beatData.getSpawnTime();
+            float beatTime = beatData.getBeatTime();
+            char letter = beatData.getLetter();
+
+            beatTimes.add(beatTime);
+            spawnTimes.add(spawnTime);
+            letterList.add(letter);
+        }
+
         wordList=new ArrayList<>();
-
-
         /*-------------------STRING BUILDER------------------------*/
 
         StringBuilder currentString = new StringBuilder();
@@ -115,14 +116,16 @@ public class Play extends ScreenAdapter {
         leftLine = new ArrayList<>();
         rightLine = new ArrayList<>();
 
-        screenWidth = Gdx.graphics.getWidth();
-        screenHeight = Gdx.graphics.getHeight();
-        score= new Score();
 
-        float centerY = screenHeight / 2;
+        score = new Score();
+        elapsedTime = 0f;
 
-        centerX = screenWidth/2;
-        centerY = screenHeight/2;
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Beatmap/Idol/audio.ogg"));
+        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.setLooping(false);
+
+        this.kick = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/type1.wav"));
+        this.snare = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/type2.wav"));
 
         FreeTypeFontGenerator wordFont = new FreeTypeFontGenerator(Gdx.files.internal("BADABB__.TTF"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameterWord= new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -141,29 +144,31 @@ public class Play extends ScreenAdapter {
 
         isDead = new ArrayList<>();
         for (int i = 0; i < noteCount; i++) {
-            isDead.add(false);
+            isDead.add(4);
         }
-        keyHandler = new KeyHandling(leftLine, rightLine,wordList,isDead,score);
-        sound = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/kick.wav"));
+
+        keyHandler = new KeyHandling(leftLine, rightLine, wordList, isDead, score, kick, snare);
+        lineBatch = new SpriteBatch();
+        textBatch = new SpriteBatch();
+        backgroundBatch = new SpriteBatch();
+
     }
 
     @Override
     public void show(){
         for(int i=0; i<noteCount;i++){
-            lineBatch = new SpriteBatch();
-            textBatch = new SpriteBatch();
-            backgroundBatch = new SpriteBatch();
-            float spawnLocationL = -LineTexture.getWidth();
+            float spawnLocationL = -lineTexture.getWidth();
             float spawnLocationR = screenWidth;
             leftLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationL));
             rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationR));
         }
+        backgroundMusic.play();
     }
     @Override
     public void render(float delta) {
         Gdx.input.setInputProcessor(keyHandler);
         elapsedTime += delta;
-        Gdx.gl.glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         backgroundBatch.begin();
@@ -180,7 +185,6 @@ public class Play extends ScreenAdapter {
 
                 lineBatch.draw(line.getTexture(), line.getX(), line.getY());
                 line.setX(line.getX() + speed * delta);
-                movingNotes++;
 
                 if (line.getX() >= centerX) {
                     if (leftLine.get(0).getLineType() == 2) {
@@ -196,7 +200,6 @@ public class Play extends ScreenAdapter {
                     else {
                         leftLine.remove(i);
                         i--;
-                        movingNotes--;
                         keyHandler.incrementDeath();
                     }
                 }
@@ -254,15 +257,32 @@ public class Play extends ScreenAdapter {
 
         for (int i = 0; i < word.length(); i++) {
             char letter = word.charAt(i);
-            if (isDead.get(i)) {
-                lblText.setColor(Color.WHITE);
-            } else {
-                lblText.setColor(Color.RED);
+            Color color;
+
+            switch (isDead.get(i)) {
+                case 0:
+                    color = Color.RED; // Bad
+                    break;
+                case 1:
+                    color = Color.YELLOW; // Good
+                    break;
+                case 2:
+                    color = Color.BLUE; // Great
+                    break;
+                case 3:
+                    color = Color.GREEN; // Perfect
+                    break;
+                default:
+                    color = Color.GRAY; // Default or unrecognized
+                    break;
             }
+
+            lblText.setColor(color);
 
             float characterX = textX + (textWidth - layout.width) / 2 + layout.runs.get(0).x + i * layout.width / word.length();
             float characterY = textY;
-            if(!String.valueOf(letter).equals("*")) {
+
+            if (!String.valueOf(letter).equals("*")) {
                 lblText.draw(textBatch, String.valueOf(letter), characterX, characterY);
             }
         }
