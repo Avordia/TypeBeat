@@ -5,7 +5,7 @@ backgroundPath: background.png
 # Beatmap Data
 sT, bT, letter
 0.0, 0.89, T
-0.5, 1.09, Y
+0.5, 1.63, Y
 0.5, 1.26, P
 0.5, 1.63, E
 0.5, 1.80, B
