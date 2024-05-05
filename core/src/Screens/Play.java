@@ -8,21 +8,36 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.video.VideoPlayer;
+import com.badlogic.gdx.video.VideoPlayerCreator;
+import com.badlogic.gdx.video.scenes.scene2d.VideoActor;
 
 
 public class Play extends ScreenAdapter {
+
+    VideoPlayer videoPlayer=VideoPlayerCreator.createVideoPlayer();;
+    FileHandle backgroundVid =  Gdx.files.internal("Video/bg1.webm");
+    Texture perfectTexture;
+    Texture greatTexture;
+    Texture goodTexture;
+    Texture badTexture;
+
+    Texture vidFrame;
+    private FileHandle videoFile;
+    private VideoPlayer player;
+    private VideoActor vidActor;
     private Sound kick;
     private Sound snare;
     private Music backgroundMusic;
@@ -39,7 +54,7 @@ public class Play extends ScreenAdapter {
     private SpriteBatch lineBatch;
     private SpriteBatch textBatch;
     private SpriteBatch backgroundBatch;
-    Animation<TextureRegion> animation;
+    private SpriteBatch judgeBatch;
     private final ArrayList<Line> leftLine;
     private final ArrayList<Line> rightLine;
     private final ArrayList<Float> beatTimes;
@@ -47,6 +62,7 @@ public class Play extends ScreenAdapter {
     private final ArrayList<Character> letterList;
     private ArrayList<String> wordList;
     private ArrayList<Integer> isDead;
+    private String[] rectangleImage;
     private float elapsedTime;
 
     private final float screenWidth;
@@ -56,14 +72,23 @@ public class Play extends ScreenAdapter {
     private final int noteCount;
     private final KeyHandling keyHandler;
     Score score;
-    Sound sound;
     private AssetManager assetManager;
+    private int colorCount=0;
 
     public Play(Game game, AssetManager assetManager) {
+
+        assetManager.get("Img/MapSprites/perfect.png", Texture.class);
+        assetManager.get("Img/MapSprites/great.png", Texture.class);
+        assetManager.get("Img/MapSprites/good.png", Texture.class);
+        assetManager.get("Img/MapSprites/bad.png", Texture.class);
+
+        rectangleImage=new String[4];
+        rectangleImage[0]="";
 
         this.assetManager = assetManager;
 
         backgroundMusic = assetManager.get("assets/Beatmap/Idol/audio.ogg", Music.class);
+        player= VideoPlayerCreator.createVideoPlayer();
         kick = assetManager.get("assets/Sound/type1.wav", Sound.class);
         snare = assetManager.get("assets/Sound/type2.wav", Sound.class);
         lineTexture = assetManager.get("Img/MapSprites/line1.png", Texture.class);
@@ -76,7 +101,6 @@ public class Play extends ScreenAdapter {
 
         String tbpFilePath = "assets/Beatmap/Idol/dragon.tbp";
         TBPFileReader.BeatmapData beatmapData = TBPFileReader.readTBPFile(tbpFilePath);
-
         String audioPath = beatmapData.getAudioPath();
         String backgroundPath = beatmapData.getBackgroundPath();
         List<TBPFileReader.BeatData> beatDataList = beatmapData.getBeatDataList();
@@ -86,15 +110,15 @@ public class Play extends ScreenAdapter {
         letterList=new ArrayList<>();
 
         for (TBPFileReader.BeatData beatData : beatDataList) {
-            float spawnTime = beatData.getSpawnTime()+2.55f; //Callibrators
-            float beatTime = beatData.getBeatTime()+2.55f; //Callibrators
+            float spawnTime = beatData.getSpawnTime()+2.4f; //Calibrators
+            float beatTime = beatData.getBeatTime()+2.4F; //Calibrators
             char letter = beatData.getLetter();
 
             beatTimes.add(beatTime);
             spawnTimes.add(spawnTime);
             letterList.add(letter);
         }
-        spawnTimes.set(0,1.4f);
+        spawnTimes.set(0,2.5f);
 
         wordList=new ArrayList<>();
         /*-------------------STRING BUILDER------------------------*/
@@ -162,7 +186,14 @@ public class Play extends ScreenAdapter {
         lineBatch = new SpriteBatch();
         textBatch = new SpriteBatch();
         backgroundBatch = new SpriteBatch();
-
+        judgeBatch = new SpriteBatch();
+        player=VideoPlayerCreator.createVideoPlayer();
+        videoFile = Gdx.files.internal("Video/bg1.webm");
+        try {
+            videoPlayer.play(backgroundVid);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -173,6 +204,11 @@ public class Play extends ScreenAdapter {
             leftLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationL));
             rightLine.add(new Line(spawnTimes.get(i),beatTimes.get(i), letterList.get(i), spawnLocationR));
         }
+        try {
+            player.play(videoFile);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -182,11 +218,15 @@ public class Play extends ScreenAdapter {
         Gdx.gl.glClearColor(0.5f, 0.2f, 0.6f, 0.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        videoPlayer.update();
+        backgroundBatch.begin();
+        backgroundBatch.draw(videoPlayer.getTexture(),0,0);
+        backgroundBatch.end();
+
         if(elapsedTime>=2.2f){
             backgroundMusic.play();
         }
-        backgroundBatch.begin();
-        backgroundBatch.end();
+
 
         lineBatch.begin();
         /* ------------------------------------------ LEFT SIDE ----------------------------------------- */
@@ -238,7 +278,6 @@ public class Play extends ScreenAdapter {
                 }
             }
         }
-
         lineBatch.end();
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
@@ -260,9 +299,7 @@ public class Play extends ScreenAdapter {
         shapeRenderer.end();
 
         textBatch.begin();
-
         lblText.setColor(Color.RED);
-
         String word = wordList.get(0);
 
         layout.setText(lblText, word);
@@ -278,19 +315,19 @@ public class Play extends ScreenAdapter {
 
             switch (isDead.get(i)) {
                 case 0:
-                    color = Color.RED; // Bad
+                    color = Color.RED;
                     break;
                 case 1:
-                    color = Color.YELLOW; // Good
+                    color = Color.YELLOW;
                     break;
                 case 2:
-                    color = Color.BLUE; // Great
+                    color = Color.BLUE;
                     break;
                 case 3:
-                    color = Color.GREEN; // Perfect
+                    color = Color.GREEN;
                     break;
                 default:
-                    color = Color.GRAY; // Default or unrecognized
+                    color = Color.GRAY;
                     break;
             }
 
@@ -306,9 +343,16 @@ public class Play extends ScreenAdapter {
         lblScore.setColor(Color.WHITE);
         lblScore.draw(textBatch, score.getScoreString(), 100,screenHeight-50);
 
-        lblCombo.setColor(Color.RED);
-        lblCombo.draw(textBatch, score.getComboString(),500,100);
+        String comboString="COMBO: "+score.getComboString();
+        lblCombo.setColor(Color.WHITE);
+        GlyphLayout layout2 = new GlyphLayout(lblCombo, comboString);
+        float comboTextX = centerX - (layout2.width/2f);
+        lblCombo.draw(textBatch, comboString, comboTextX, 50);
+
         textBatch.end();
+
+        animateJudge(keyHandler.judgeTiming(leftLine.get(0)));
+
     }
 
     @Override
@@ -318,5 +362,34 @@ public class Play extends ScreenAdapter {
         lblCombo.dispose();
         shapeRenderer.dispose();
         shapeAccentColor.dispose();
+        player.dispose();
     }
+
+    private void animateJudge(int judge) {
+        Texture feedbackTexture;
+
+        switch (judge) {
+            case 3:  // Perfect
+                feedbackTexture = perfectTexture;
+                break;
+            case 2:  // Great
+                feedbackTexture = greatTexture;
+                break;
+            case 1:  // Good
+                feedbackTexture = goodTexture;
+                break;
+            default: // Bad or other
+                feedbackTexture = badTexture;
+                break;
+        }
+
+        if (feedbackTexture != null) {
+            float feedbackX = screenWidth / 2 - feedbackTexture.getWidth() / 2;
+            float feedbackY = screenHeight / 2 - feedbackTexture.getHeight() / 2;
+            judgeBatch.begin();
+            judgeBatch.draw(feedbackTexture, feedbackX, feedbackY);
+            judgeBatch.end();
+        }
+    }
+
 }

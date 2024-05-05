@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import java.util.ArrayList;
 
 public class KeyHandling extends InputAdapter {
+
     int deadLines=0;
     Sound kick;
     Sound snare;
@@ -42,19 +43,24 @@ public class KeyHandling extends InputAdapter {
         int judge=judgeTiming(leftLine.get(0));
         if (keycode == Input.Keys.SPACE) {
             if (isLineCloseToCenter(leftLine.get(0))) {
+                if (checkChar('/',leftLine.get(0).getLetter())){
+                    deleteLines(0);
+                    score.resetCombo();
+                    return true;
+                }
                 if(judge==0) {
                     score.resetCombo();
                 }
                 else if(judge==1) {
-                    scorePoint(1 + (int) calculateTiming(leftLine.get(0)),leftLine.get(0).getLetter(),'/',judge);
+                    scorePoint(leftLine.get(0).getLetter(),'/',judge,100);
                     return true;
                 }
                 else if(judge==2) {
-                    scorePoint(1 + (int) calculateTiming(leftLine.get(0)),leftLine.get(0).getLetter(),'/',judge);
+                    scorePoint(leftLine.get(0).getLetter(),'/',judge,200);
                     return true;
                 }
                 else if(judge==3) {
-                    scorePoint(1 + (int) calculateTiming(leftLine.get(0)),leftLine.get(0).getLetter(),'/',judge);
+                    scorePoint(leftLine.get(0).getLetter(),'/',judge,350);
                     return true;
                 }
                 deleteLines(0);
@@ -63,19 +69,24 @@ public class KeyHandling extends InputAdapter {
         else if(keycode >= Input.Keys.A && keycode <= Input.Keys.Z){
             char keyPressed = (char) (keycode - Input.Keys.A + 'A');
             if (isLineCloseToCenter(leftLine.get(0))) {
+                if (!checkChar(keyPressed,leftLine.get(0).getLetter())){
+                    deleteLines(0);
+                    score.resetCombo();
+                    return true;
+                }
                 if(judge==0) {
                     score.resetCombo();
                 }
                 else if(judge==1) {
-                    scorePoint(1 + (int) calculateTiming(leftLine.get(0)),leftLine.get(0).getLetter(),'/',judge);
+                    scorePoint(leftLine.get(0).getLetter(),keyPressed,judge,100);
                     return true;
                 }
                 else if(judge==2) {
-                    scorePoint(1 + (int) calculateTiming(leftLine.get(0)),leftLine.get(0).getLetter(),'/',judge);
+                    scorePoint(leftLine.get(0).getLetter(),keyPressed,judge,200);
                     return true;
                 }
                 else if(judge==3) {
-                    scorePoint(1 + (int) calculateTiming(leftLine.get(0)),leftLine.get(0).getLetter(),'/',judge);
+                    scorePoint(leftLine.get(0).getLetter(),keyPressed,judge,350);
                     return true;
                 }
                 deleteLines(0);
@@ -86,17 +97,10 @@ public class KeyHandling extends InputAdapter {
 
     /*---------------------------FUNCTIONS------------------------------------------*/
 
-    public void scorePoint(float timing, char a, char b, int judge) {
+    public void scorePoint(char a, char b,int judge, int judgeScore) {
         if (checkChar(a, b)) {
-            float maxTiming = centerX / 6;
-            float relativeTiming = timing / maxTiming;
-
-            float baseScore = 1000;
-            float timingScore = baseScore * (1 - relativeTiming);
-
-            score.setScore(timingScore *score.getCombo());
+            score.setScore(judgeScore*score.getCombo());
             score.incrementCombo();
-
             deleteLines(judge);
         } else {
             score.resetCombo();
@@ -129,7 +133,6 @@ public class KeyHandling extends InputAdapter {
             }
             kick.play();
         }
-
         isDead.set(deadLines,judge);
         deadLines++;
     }
@@ -144,12 +147,10 @@ public class KeyHandling extends InputAdapter {
 
     public int judgeTiming(Line line) {
         float timing = calculateTiming(line);
-
         float perfectThreshold = centerX / 10;
         float greatThreshold = centerX / 7;
         float goodThreshold = centerX / 6;
 
-        // Determine the judgment based on the calculated timing
         if (timing <= perfectThreshold) {
             return 3;
         } else if (timing <= greatThreshold) {
@@ -161,6 +162,7 @@ public class KeyHandling extends InputAdapter {
             return 0;
         }
     }
+
     private boolean checkChar(char a, char b){
         if(a=='*' & b=='/'){
             return true;
