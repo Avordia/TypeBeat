@@ -28,7 +28,7 @@ import com.badlogic.gdx.video.scenes.scene2d.VideoActor;
 public class Play extends ScreenAdapter {
 
     private ShaderProgram shaderProgram;
-    private Color currentTint = Color.WHITE;
+    private Color currentTint = Color.RED;
 
     VideoPlayer videoPlayer=VideoPlayerCreator.createVideoPlayer();;
     FileHandle backgroundVid =  Gdx.files.internal("Video/bg1.webm");
