@@ -194,6 +194,7 @@ public class Play extends ScreenAdapter {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+        videoPlayer.setLooping(true);
     }
 
     @Override
