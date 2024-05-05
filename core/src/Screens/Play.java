@@ -27,6 +27,9 @@ import com.badlogic.gdx.video.scenes.scene2d.VideoActor;
 
 public class Play extends ScreenAdapter {
 
+    private ShaderProgram shaderProgram;
+    private Color currentTint = Color.WHITE;
+
     VideoPlayer videoPlayer=VideoPlayerCreator.createVideoPlayer();;
     FileHandle backgroundVid =  Gdx.files.internal("Video/bg1.webm");
     Texture perfectTexture;
@@ -210,6 +213,7 @@ public class Play extends ScreenAdapter {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+        shaderProgram = new ShaderProgram(Gdx.files.internal("Shader/default.vert"), Gdx.files.internal("Shader/color_tint_shader.frag"));
     }
 
     @Override
@@ -220,6 +224,7 @@ public class Play extends ScreenAdapter {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         videoPlayer.update();
+
         backgroundBatch.begin();
         backgroundBatch.draw(videoPlayer.getTexture(),0,0);
         backgroundBatch.end();
@@ -353,7 +358,6 @@ public class Play extends ScreenAdapter {
         textBatch.end();
 
         animateJudge(keyHandler.judgeTiming(leftLine.get(0)));
-
     }
 
     @Override
@@ -364,6 +368,7 @@ public class Play extends ScreenAdapter {
         shapeRenderer.dispose();
         shapeAccentColor.dispose();
         player.dispose();
+        shaderProgram.dispose();
     }
 
     private void animateJudge(int judge) {
@@ -392,5 +397,10 @@ public class Play extends ScreenAdapter {
             judgeBatch.end();
         }
     }
+
+    private void updateColorTint(Color newTint) {
+        currentTint.set(newTint);
+    }
+
 
 }
