@@ -20,7 +20,7 @@ import org.w3c.dom.Text;
 import java.io.FileNotFoundException;
 
 public class LoadingScreen extends ScreenAdapter {
-    VideoPlayer videoPlayer= VideoPlayerCreator.createVideoPlayer();;
+    VideoPlayer videoPlayer= VideoPlayerCreator.createVideoPlayer();
     FileHandle backgroundVid =  Gdx.files.internal("Video/bg1.webm");
     ShaderProgram shaderProgram = new ShaderProgram(Gdx.files.internal("Shader/default.vert"), Gdx.files.internal("Shader/color_tint_shader.frag"));
     Texture logo;

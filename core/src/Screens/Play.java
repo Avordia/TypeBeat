@@ -36,6 +36,7 @@ public class Play extends ScreenAdapter {
     Texture greatTexture;
     Texture goodTexture;
     Texture badTexture;
+    Texture space=new Texture("Img/MapSprites/space.png");
     Texture logoPlay;
     Texture vidFrame;
     private FileHandle videoFile;
