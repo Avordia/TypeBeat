@@ -261,7 +261,7 @@ public class Register extends JFrame {
             //close connection
             
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(new JFrame(), "WA NA CONNECT ANGA KA", "WARNING!", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(new JFrame(), "Database Not Connected!", "WARNING!", JOptionPane.ERROR_MESSAGE);
         }
         
         

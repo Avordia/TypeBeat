@@ -202,7 +202,7 @@ public class Login extends JFrame {
                         JOptionPane.showMessageDialog(this, "Login Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
                         this.setVisible(false);
                         this.dispose();
-                        DevTest.main(new String[] {});
+                        DesktopLauncher.main(new String[] {});
                         // Additional logic after successful login can be added here
                     } else {
                         JOptionPane.showMessageDialog(this, "Login Failed. Incorrect Username or Password", "Error", JOptionPane.ERROR_MESSAGE);
