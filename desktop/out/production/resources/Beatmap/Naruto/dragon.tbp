@@ -1,0 +1,10 @@
+# Audio and Background Information
+audioPath: audio.ogg
+backgroundPath: background.png
+
+# Beatmap Data
+sT, bT, letter
+0.0, 1.0, T
+0.66, 1.66, Y
+1.38, 2.38, P
+1.74, 2.74, E
