@@ -8,7 +8,7 @@ import com.badlogic.gdx.audio.Sound;
 import java.util.ArrayList;
 
 public class KeyHandling extends InputAdapter {
-
+    private int colorCount=0;
     int deadLines=0;
     Sound kick;
     Sound snare;
@@ -43,11 +43,6 @@ public class KeyHandling extends InputAdapter {
         int judge=judgeTiming(leftLine.get(0));
         if (keycode == Input.Keys.SPACE) {
             if (isLineCloseToCenter(leftLine.get(0))) {
-                if (checkChar('/',leftLine.get(0).getLetter())){
-                    deleteLines(0);
-                    score.resetCombo();
-                    return true;
-                }
                 if(judge==0) {
                     score.resetCombo();
                 }
@@ -110,6 +105,7 @@ public class KeyHandling extends InputAdapter {
 
     public void deleteLines(int judge) {
         if (leftLine.get(0).getLineType() == 2) {
+            incrementColorCount();
             snare.play();
             for(int i=0; i<wordList.get(0).length(); i++){
                 isDead.remove(0);
@@ -164,7 +160,7 @@ public class KeyHandling extends InputAdapter {
     }
 
     private boolean checkChar(char a, char b){
-        if(a=='*' & b=='/'){
+        if(a=='/' & b=='*'){
             return true;
         }
         return a==b;
@@ -194,6 +190,17 @@ public class KeyHandling extends InputAdapter {
 
     public void setDeath(int death){
         deadLines=death;
+    }
+
+    public void incrementColorCount(){
+        colorCount++;
+        if(colorCount>3){
+            colorCount=0;
+        }
+    }
+
+    public int getColorCount(){
+        return colorCount;
     }
 
 }

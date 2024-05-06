@@ -36,7 +36,7 @@ public class Play extends ScreenAdapter {
     Texture greatTexture;
     Texture goodTexture;
     Texture badTexture;
-
+    Texture logoPlay;
     Texture vidFrame;
     private FileHandle videoFile;
     private VideoPlayer player;
@@ -76,7 +76,6 @@ public class Play extends ScreenAdapter {
     private final KeyHandling keyHandler;
     Score score;
     private AssetManager assetManager;
-    private int colorCount=0;
 
     public Play(Game game, AssetManager assetManager) {
 
@@ -95,6 +94,8 @@ public class Play extends ScreenAdapter {
         kick = assetManager.get("assets/Sound/type1.wav", Sound.class);
         snare = assetManager.get("assets/Sound/type2.wav", Sound.class);
         lineTexture = assetManager.get("Img/MapSprites/line1.png", Texture.class);
+        logoPlay= new Texture("Img/logo.png");
+
 
         this.game = game;
         screenWidth = Gdx.graphics.getWidth();
@@ -223,11 +224,34 @@ public class Play extends ScreenAdapter {
         Gdx.gl.glClearColor(0.5f, 0.2f, 0.6f, 0.0f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        switch(keyHandler.getColorCount()){
+            case 0:
+                currentTint=Color.VIOLET;
+                break;
+            case 1:
+                currentTint=Color.RED;
+                break;
+            case 2:
+                currentTint=Color.BLUE;
+                break;
+            case 3:
+                currentTint=Color.BROWN;
+                break;
+        }
+
         videoPlayer.update();
+        if (shaderProgram != null && shaderProgram.isCompiled()) {
+            shaderProgram.begin();
+            shaderProgram.setUniformf("u_tint", currentTint);
+        }
 
         backgroundBatch.begin();
+        backgroundBatch.setShader(shaderProgram);
         backgroundBatch.draw(videoPlayer.getTexture(),0,0);
         backgroundBatch.end();
+        if (shaderProgram != null && shaderProgram.isCompiled()) {
+            shaderProgram.end();
+        }
 
         if(elapsedTime>=2.2f){
             backgroundMusic.play();
@@ -248,6 +272,7 @@ public class Play extends ScreenAdapter {
 
                 if (line.getX() >= centerX) {
                     if (leftLine.get(0).getLineType() == 2) {
+                        keyHandler.incrementColorCount();
                         for(int j=0; j<wordList.get(0).length(); j++){
                             isDead.remove(0);
                         }
@@ -355,9 +380,12 @@ public class Play extends ScreenAdapter {
         float comboTextX = centerX - (layout2.width/2f);
         lblCombo.draw(textBatch, comboString, comboTextX, 50);
 
+        float logoAspectRatio= (float) logoPlay.getWidth() /logoPlay.getHeight();
+
+        textBatch.draw(logoPlay,centerX- 100,screenHeight-120,200,200/logoAspectRatio);
+
         textBatch.end();
 
-        animateJudge(keyHandler.judgeTiming(leftLine.get(0)));
     }
 
     @Override
@@ -371,32 +399,6 @@ public class Play extends ScreenAdapter {
         shaderProgram.dispose();
     }
 
-    private void animateJudge(int judge) {
-        Texture feedbackTexture;
-
-        switch (judge) {
-            case 3:  // Perfect
-                feedbackTexture = perfectTexture;
-                break;
-            case 2:  // Great
-                feedbackTexture = greatTexture;
-                break;
-            case 1:  // Good
-                feedbackTexture = goodTexture;
-                break;
-            default: // Bad or other
-                feedbackTexture = badTexture;
-                break;
-        }
-
-        if (feedbackTexture != null) {
-            float feedbackX = screenWidth / 2 - feedbackTexture.getWidth() / 2;
-            float feedbackY = screenHeight / 2 - feedbackTexture.getHeight() / 2;
-            judgeBatch.begin();
-            judgeBatch.draw(feedbackTexture, feedbackX, feedbackY);
-            judgeBatch.end();
-        }
-    }
 
     private void updateColorTint(Color newTint) {
         currentTint.set(newTint);
