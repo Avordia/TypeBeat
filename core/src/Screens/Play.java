@@ -116,7 +116,7 @@ public class Play extends ScreenAdapter {
 
         for (TBPFileReader.BeatData beatData : beatDataList) {
             float spawnTime = beatData.getSpawnTime()+2.4f; //Calibrators
-            float beatTime = beatData.getBeatTime()+2.4F; //Calibrators
+            float beatTime = beatData.getBeatTime()+2.4f; //Calibrators
             char letter = beatData.getLetter();
 
             beatTimes.add(beatTime);
@@ -163,6 +163,7 @@ public class Play extends ScreenAdapter {
         backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Beatmap/Idol/audio.ogg"));
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.setLooping(false);
+        backgroundMusic.pause();
 
         this.kick = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/type1.wav"));
         this.snare = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/type2.wav"));
@@ -274,13 +275,13 @@ public class Play extends ScreenAdapter {
                 if (line.getX() >= centerX) {
                     if (leftLine.get(0).getLineType() == 2) {
                         keyHandler.incrementColorCount();
-                        for(int j=0; j<wordList.get(0).length(); j++){
-                            isDead.remove(0);
-                        }
                         keyHandler.setDeath(0);
                         wordList.remove(0);
                         if (!leftLine.isEmpty()) {
                             leftLine.remove(0);
+                        }
+                        for(int j=0; j<wordList.get(0).length(); j++){
+                            isDead.remove(0);
                         }
                     }
                     else {
@@ -304,6 +305,11 @@ public class Play extends ScreenAdapter {
                 line.setX(line.getX() - speed * delta);
 
                 if (line.getX() <= centerX) {
+                    rightLine.remove(i);
+                    i--;
+                    score.resetCombo();
+                }
+                if(line.getX()<=centerX-30){
                     rightLine.remove(i);
                     i--;
                     score.resetCombo();
@@ -386,6 +392,11 @@ public class Play extends ScreenAdapter {
         textBatch.draw(logoPlay,centerX- 100,screenHeight-120,200,200/logoAspectRatio);
 
         textBatch.end();
+
+        if(leftLine.isEmpty()){
+            backgroundMusic.stop();
+            game.setScreen(new ScoreScreen(game,score.getScore(), noteCount));
+        }
 
     }
 
