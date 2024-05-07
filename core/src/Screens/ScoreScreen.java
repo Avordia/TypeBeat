@@ -154,6 +154,7 @@ public class ScoreScreen extends ScreenAdapter {
 
         batch.end();
     }
+
     // sa Map na table, e add si Idol. Iyang MusicID kay 1.
     public void insertScore(){
         connectionDB();
