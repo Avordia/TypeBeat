@@ -55,9 +55,9 @@ public class ScoreScreen extends ScreenAdapter {
         }
         videoPlayer.setLooping(true);
 
-        FreeTypeFontGenerator scoreFont = new FreeTypeFontGenerator(Gdx.files.internal("BADABB__.TTF"));
+        FreeTypeFontGenerator scoreFont = new FreeTypeFontGenerator(Gdx.files.internal("Franklin Gothic Heavy Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameterScore= new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameterScore.size=100;
+        parameterScore.size=50;
 
         lblScore=scoreFont.generateFont(parameterScore);
         shapeRenderer = new ShapeRenderer();
@@ -110,12 +110,13 @@ public class ScoreScreen extends ScreenAdapter {
 
         batch.begin();
         if(animatedScore<=score){
-            lblScore.draw(batch,"Score: "+(animatedScore+=(score/200)),100,100);
+            lblScore.draw(batch,"SCORE: "+(animatedScore+=(score/200)),100,100);
         }
         else{
             lblScore.draw(batch, "Score: "+score,100,100);
         }
-        batch.draw(logo,((float) Gdx.graphics.getWidth() /2)-((float) logo.getWidth() /2), ((float) Gdx.graphics.getHeight() /2)-((float) logo.getHeight() /2),500/logo.getHeight(),500);
+        float size=500;
+        batch.draw(logo,((float) Gdx.graphics.getWidth() /2)-((float) size /2), ((float) Gdx.graphics.getHeight() /2)-((float) size /2), size,size);
         batch.end();
     }
 
