@@ -240,12 +240,33 @@ public class ScoreScreen extends ScreenAdapter {
     }
 
     public String getBestPlayerSQL(){
+        connectionDB();
+        String bestPlayer = "";
+
+
+        try {
+            Statement st = con.createStatement();
+
+            String selectBestPlayer = "SELECT l.firstname " +
+                    "FROM scores AS s " +
+                    "INNER JOIN login AS l ON s.userID = l.userID " +
+                    "WHERE s.mapID = " + mapID + " " +
+                    "ORDER BY s.scores DESC " +
+                    "LIMIT 1";
+            ResultSet rs = st.executeQuery(selectBestPlayer);
+
+            if (rs.next()) {
+                bestPlayer = rs.getString("firstname");
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
         //goal ninyo ani kay e return ang player na naay highest score sa kana na map.
         //pwede ra mo mag add ug lain row sa SQL para testing basta e remove basta succesful na ang testing.
         //e return ang best player as string. return player;
 
-
-        return "";
+        return bestPlayer;
     }
 
 
