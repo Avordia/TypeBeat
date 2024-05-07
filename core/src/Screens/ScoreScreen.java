@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
+import java.sql.*;
 import org.w3c.dom.Text;
 
 import java.io.FileNotFoundException;
@@ -28,7 +29,6 @@ public class ScoreScreen extends ScreenAdapter {
     ShaderProgram shaderProgram = new ShaderProgram(Gdx.files.internal("Shader/default.vert"), Gdx.files.internal("Shader/color_tint_shader.frag"));
     Texture logo;
     ShapeRenderer shapeRenderer;
-
     private BitmapFont lblScore;
     private final Game game;
     private SpriteBatch batch;
@@ -42,11 +42,18 @@ public class ScoreScreen extends ScreenAdapter {
     private int animatedScore=0;
     private GlyphLayout glyph = new GlyphLayout();
     int id;
+    private int userID;
+    private int mapID;
+    private int bestScore;
     String musicTitle;
 
-    public ScoreScreen(Game game, int score, int noteCount){
+    Connection con;
+
+    public ScoreScreen(Game game, int score, int noteCount, int userID, int mapID){
         this.game = game;
         this.score = score;
+        this.userID = userID;
+        this.mapID = mapID;
         for(int i=0; i<noteCount;i++){
             maximumScore+=350*noteCount;
         }
@@ -67,6 +74,23 @@ public class ScoreScreen extends ScreenAdapter {
         int id=1;
         String musicTitle="Idol";
     }
+
+    public void connectionDB () {
+        try {
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            String url = "jdbc:mysql://localhost:3306/typebeat_db"; // database declaration
+            String username = "root";
+            String password = "";
+
+            con = DriverManager.getConnection(url, username, password);
+
+        } catch (Exception e) {
+        }
+    }
+
+
 
     @Override
     public void show() {
@@ -132,6 +156,24 @@ public class ScoreScreen extends ScreenAdapter {
     }
     // sa Map na table, e add si Idol. Iyang MusicID kay 1.
     public void insertScore(){
+        connectionDB();
+
+        try {
+
+            String insertQuery = "INSERT INTO scores (userID, mapID, scores) VALUES (?, ?, ?)";
+            PreparedStatement ps = con.prepareStatement(insertQuery);
+            ps.setInt(1, userID);
+            ps.setInt(2, mapID);
+            ps.setInt(3, score);
+
+            ps.executeUpdate();
+
+            System.out.println("Score inserted Successfully!");
+
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         //Goal ani kay mu insert iyang score sa Score table.
         //Basta foreign key ang ID, ug Username.
@@ -143,23 +185,65 @@ public class ScoreScreen extends ScreenAdapter {
     }
 
     public String getUserScoreSQL(){
-        String username="inyong sample username";
+        connectionDB();
+
+        String scoreString = "";
+        try {
+            Statement st = con.createStatement();
+
+            String selectScore = "SELECT scores FROM highscores WHERE userID = " + userID;
+            ResultSet rs = st.executeQuery(selectScore);
+
+
+            if (rs.next()) {
+                score = rs.getInt("scores");
+                scoreString = String.valueOf(score);
+
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
         //insert logic sa pagkuha sa score
         //e return ang score as string. ""+score
-        return "";
+
+        return scoreString;
     }
 
     public String getBestScoreSQL(){
+        connectionDB();
+
+        String bestScoreString = "";
+
+        try{
+            Statement st = con.createStatement();
+
+            String selectBestScore = "SELECT MAX(scores) FROM highscores";
+            ResultSet rs = st.executeQuery(selectBestScore);
+
+            if(rs.next()){
+                bestScore = rs.getInt("scores");
+                bestScoreString = String.valueOf(bestScore);
+            }
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
         //goal ninyo ani kay e return ang highest score sa kana na map.
         //pwede ra mo mag add ug lain row sa SQL para testing basta e remove basta succesful na ang testing.
         //e return ang score as string. ""+score
-        return "";
+
+        return bestScoreString;
     }
 
     public String getBestPlayerSQL(){
         //goal ninyo ani kay e return ang player na naay highest score sa kana na map.
         //pwede ra mo mag add ug lain row sa SQL para testing basta e remove basta succesful na ang testing.
         //e return ang best player as string. return player;
+
+
         return "";
     }
 
