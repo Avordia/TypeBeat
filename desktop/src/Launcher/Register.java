@@ -8,11 +8,8 @@ package Launcher;/*
  * @author DESKTOP - JARED
  */
 
+import java.sql.*;
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 public class Register extends JFrame {
 
     /**
@@ -21,6 +18,7 @@ public class Register extends JFrame {
     Connection con = null;
     public Register() {
         initComponents();
+        //con = dbConnection.con();
         
     }
 
@@ -34,62 +32,96 @@ public class Register extends JFrame {
     private void initComponents() {
 
         jButton1 = new JButton();
+        jPanel1 = new JPanel();
+        jPanel2 = new JPanel();
+        jLabel6 = new JLabel();
         jLabel1 = new JLabel();
         txtUsername = new JTextField();
-        jLabel2 = new JLabel();
-        jLabel3 = new JLabel();
         txtFirstName = new JTextField();
+        jLabel3 = new JLabel();
         jLabel4 = new JLabel();
         txtLastName = new JTextField();
-        btnRegister = new JButton();
-        btnClear = new JButton();
-        jLabel6 = new JLabel();
-        btnLogin = new JButton();
+        jLabel2 = new JLabel();
         txtPassword = new JPasswordField();
+        btnClear = new JButton();
+        btnRegister = new JButton();
+        btnLogin = new JButton();
+        jLabel5 = new JLabel();
 
         jButton1.setText("jButton1");
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setTitle("TypeBeat - Register");
+        setMaximumSize(new java.awt.Dimension(720, 640));
+        setMinimumSize(new java.awt.Dimension(720, 640));
+        setName("registerForm"); // NOI18N
+        setPreferredSize(new java.awt.Dimension(720, 640));
+        setResizable(false);
 
-        jLabel1.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jPanel1.setBackground(new java.awt.Color(51, 51, 51));
+        jPanel1.setForeground(new java.awt.Color(51, 51, 51));
+        jPanel1.setMaximumSize(new java.awt.Dimension(720, 480));
+        jPanel1.setMinimumSize(new java.awt.Dimension(720, 480));
+
+        jPanel2.setBackground(new java.awt.Color(51, 51, 51));
+
+        jLabel6.setFont(new java.awt.Font("Franklin Gothic Medium", 1, 24)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setHorizontalAlignment(SwingConstants.CENTER);
+        jLabel6.setText("Register");
+        jLabel6.setToolTipText("");
+
+        jLabel1.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Username");
 
+        txtUsername.setBackground(new java.awt.Color(102, 102, 102));
+        txtUsername.setForeground(new java.awt.Color(255, 255, 255));
         txtUsername.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtUsernameActionPerformed(evt);
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel2.setText("Password");
-
-        jLabel3.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        jLabel3.setText("First Name");
-
+        txtFirstName.setBackground(new java.awt.Color(102, 102, 102));
+        txtFirstName.setForeground(new java.awt.Color(255, 255, 255));
         txtFirstName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtFirstNameActionPerformed(evt);
             }
         });
 
-        jLabel4.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("First Name");
+
+        jLabel4.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Last Name");
 
+        txtLastName.setBackground(new java.awt.Color(102, 102, 102));
+        txtLastName.setForeground(new java.awt.Color(255, 255, 255));
         txtLastName.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtLastNameActionPerformed(evt);
             }
         });
 
-        btnRegister.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
-        btnRegister.setText("Register");
-        btnRegister.addActionListener(new java.awt.event.ActionListener() {
+        jLabel2.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Password");
+
+        txtPassword.setBackground(new java.awt.Color(102, 102, 102));
+        txtPassword.setForeground(new java.awt.Color(255, 255, 255));
+        txtPassword.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRegisterActionPerformed(evt);
+                txtPasswordActionPerformed(evt);
             }
         });
 
-        btnClear.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        btnClear.setBackground(new java.awt.Color(102, 102, 102));
+        btnClear.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        btnClear.setForeground(new java.awt.Color(255, 255, 255));
         btnClear.setText("Clear");
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -97,10 +129,19 @@ public class Register extends JFrame {
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Bahnschrift", 1, 24)); // NOI18N
-        jLabel6.setText("Register");
+        btnRegister.setBackground(new java.awt.Color(102, 102, 102));
+        btnRegister.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        btnRegister.setForeground(new java.awt.Color(255, 255, 255));
+        btnRegister.setText("Register");
+        btnRegister.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegisterActionPerformed(evt);
+            }
+        });
 
-        btnLogin.setFont(new java.awt.Font("Bahnschrift", 1, 14)); // NOI18N
+        btnLogin.setBackground(new java.awt.Color(102, 102, 102));
+        btnLogin.setFont(new java.awt.Font("Franklin Gothic Demi", 0, 14)); // NOI18N
+        btnLogin.setForeground(new java.awt.Color(255, 255, 255));
         btnLogin.setText("Login");
         btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -108,76 +149,97 @@ public class Register extends JFrame {
             }
         });
 
-        txtPassword.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtPasswordActionPerformed(evt);
-            }
-        });
+        GroupLayout jPanel2Layout = new GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnClear, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnLogin, GroupLayout.DEFAULT_SIZE, 134, Short.MAX_VALUE))
+                    .addComponent(txtPassword)
+                    .addComponent(jLabel1)
+                    .addComponent(txtUsername)
+                    .addComponent(txtFirstName)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4)
+                    .addComponent(txtLastName)
+                    .addComponent(jLabel2)
+                    .addComponent(btnRegister, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel6, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap(20, Short.MAX_VALUE)
+                .addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtUsername, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel4, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel2, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnRegister, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnClear, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnLogin, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)))
+        );
+
+        jLabel5.setHorizontalAlignment(SwingConstants.LEFT);
+        jLabel5.setIcon(new ImageIcon(getClass().getResource("/Img/background.png"))); // NOI18N
+        jLabel5.setText("jLabel5");
+        jLabel5.setMaximumSize(new java.awt.Dimension(200, 768));
+        jLabel5.setMinimumSize(new java.awt.Dimension(200, 768));
+
+        GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel5, GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jLabel5, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(59, 59, 59)
-                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(jLabel1)
-                                .addComponent(jLabel2)
-                                .addComponent(jLabel3)
-                                .addComponent(jLabel4)
-                                .addComponent(txtUsername, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
-                                .addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)))
-                        .addGroup(layout.createSequentialGroup()
-                            .addGap(28, 28, 28)
-                            .addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 121, GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                            .addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, 281, GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnRegister)
-                                .addGap(103, 103, 103)
-                                .addComponent(btnClear, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnLogin, GroupLayout.PREFERRED_SIZE, 89, GroupLayout.PREFERRED_SIZE)
-                                .addGap(96, 96, 96)))))
-                .addContainerGap(215, Short.MAX_VALUE))
+            .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, 714, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtUsername, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2, GroupLayout.PREFERRED_SIZE, 25, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(txtPassword, GroupLayout.PREFERRED_SIZE, 33, GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnRegister, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnClear, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(btnLogin, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)
-                .addGap(31, 31, 31))
+            .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void txtFirstNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFirstNameActionPerformed
@@ -203,27 +265,27 @@ public class Register extends JFrame {
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
         // TODO add your handling code here:
-        
+
         // assigned the textfields to a variable
-        String username = txtUsername.getText(); 
+        String username = txtUsername.getText();
         String fName = txtFirstName.getText();
         String lName = txtLastName.getText();
-        
+
         char[] passcode = txtPassword.getPassword();
         String password = String.valueOf(passcode); //char to string the value of password
-        
-        
+
+
         try {
-            
+
             String url = "jdbc:mysql://localhost:3306/typebeat_db"; //database declaration
             String user = "root";
             String pass = "";
-            
+
             Connection con = DriverManager.getConnection(url, user, pass); //connects to database
             Statement st = con.createStatement();
-            
+
             System.out.println("Connected");
-            
+
             //checks if the fields are empty
             if (txtUsername != null && txtUsername.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(new JFrame(), "Username is Required", "WARNING!", JOptionPane.ERROR_MESSAGE);
@@ -241,39 +303,37 @@ public class Register extends JFrame {
                 String selectQuery = ("SELECT COUNT(*) FROM login WHERE username = '" + username + "'"); //select username from login
                 ResultSet result = st.executeQuery(selectQuery); //execute the select query
                 result.next(); //set the pointer to the first row of the login table
-                
+
                 int count = result.getInt(1);
-                
+
                 //checks if username already exists on the database
                 if (count > 0) {
-                     //alert if username already exists on the database
-                     JOptionPane.showMessageDialog(null, "This username already exists", "WARNING!", JOptionPane.WARNING_MESSAGE);
+                    //alert if username already exists on the database
+                    JOptionPane.showMessageDialog(null, "This username already exists", "WARNING!", JOptionPane.WARNING_MESSAGE);
                 }
                 else {
                     //if the username inputted is not yet on the database, insert the infos on the db
                     String insertQuery = ("INSERT INTO login (username, firstName, lastName, password) VALUES ('" + username + "', '" + fName + "', '" + lName + "', '" + password + "')");
                     st.executeUpdate(insertQuery); // execute the insert query
                     JOptionPane.showMessageDialog(null, "You are now Registered!", "MESSAGE", JOptionPane.INFORMATION_MESSAGE); //reigstered alert
-                    
+
                 }
             }
-            
+
             //close connection
-            
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(new JFrame(), "Database Not Connected!", "WARNING!", JOptionPane.ERROR_MESSAGE);
         }
-        
-        
     }//GEN-LAST:event_btnRegisterActionPerformed
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
         // TODO add your handling code here:
-            this.setVisible(false);
-            this.dispose();
+        this.setVisible(false);
+        this.dispose();
 
-            Login login = new Login();
-            login.setVisible(true);
+        Login login = new Login();
+        login.setVisible(true);
     }//GEN-LAST:event_btnLoginActionPerformed
 
     private void txtPasswordActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPasswordActionPerformed
@@ -324,7 +384,10 @@ public class Register extends JFrame {
     private JLabel jLabel2;
     private JLabel jLabel3;
     private JLabel jLabel4;
+    private JLabel jLabel5;
     private JLabel jLabel6;
+    private JPanel jPanel1;
+    private JPanel jPanel2;
     private JTextField txtFirstName;
     private JTextField txtLastName;
     private JPasswordField txtPassword;
