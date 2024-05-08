@@ -46,6 +46,10 @@ public class ScoreScreen extends ScreenAdapter {
     private int mapID;
     private int bestScore;
     String musicTitle;
+    
+    String testUserScore;
+    String testBestPlayerScore;
+    String testBestScore;
 
     Connection con=null;
 
@@ -75,6 +79,10 @@ public class ScoreScreen extends ScreenAdapter {
         String musicTitle="Idol";
 
         connectionDB();
+
+        testUserScore=getUserScoreSQL();
+        testBestPlayerScore=getBestPlayerSQL();
+        testBestScore=+getBestScoreSQL();
     }
 
     public void connectionDB () {
@@ -150,9 +158,9 @@ public class ScoreScreen extends ScreenAdapter {
         batch.draw(logo,((float) Gdx.graphics.getWidth() /2)-((float) size /2), ((float) Gdx.graphics.getHeight() /2)-((float) size /2), size,size);
 
         /*----------------------------------------MGA TEST CASE--------------------------------*/
-        lblScore.draw(batch,"Test case: "+getUserScoreSQL(),100,300); //1
-        lblScore.draw(batch,"Test case: "+getBestPlayerSQL(),100,500); //2
-        lblScore.draw(batch,"Test case: "+getBestScoreSQL(),100, 600); //3
+        lblScore.draw(batch,"Test case: "+testUserScore,100,300); //1
+        lblScore.draw(batch,"Test case: "+testBestPlayerScore,100,500); //2
+        lblScore.draw(batch,"Test case: "+testBestScore,100, 600); //3
         /*----------------------------------------MGA TEST CASE--------------------------------*/
 
         batch.end();
