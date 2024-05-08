@@ -1,6 +1,7 @@
 # Audio and Background Information
 audioPath: audio.ogg
 backgroundPath: background.png
+musicID: 1
 
 # Beatmap Data
 sT, bT, letter

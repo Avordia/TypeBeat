@@ -7,8 +7,11 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
@@ -42,8 +45,12 @@ public class TrackSelection extends ScreenAdapter {
     private Stage stage;
     private Texture buttonPlyS;
     private Texture buttonPlyH;
+    private BitmapFont lblTitle;
+    private GlyphLayout layout;
     private SpriteBatch batch;
     private ArrayList<Track> trackList;
+    private ArrayList<String> tbpPath;
+    private ArrayList<String> title;
     Button btnPrev;
     Button btnNext;
     int l;
@@ -58,12 +65,24 @@ public class TrackSelection extends ScreenAdapter {
     public TrackSelection(Game game) { //Add tracks here
         this.game=game;
         trackList = new ArrayList<Track>();
-        trackList.add(new Track("Song1", "Artist1", 3, "bm/DragonBall.png", "Beatmap/Dragon/audio.ogg",143));
-        trackList.add(new Track("Song2", "Artist2", 1, "bm/Naruto.png", "Beatmap/Naruto/audio.ogg",143));
-        trackList.add(new Track("Song3", "Artist3", 2, "bm/Nora.png", "Beatmap/Nora/audio.ogg",143));
-        trackList.add(new Track("Song4", "Artist4", 2, "bm/Oshi.png", "Beatmap/Nora/audio.ogg",143));
+        trackList.add(new Track("Song1", "Artist1", 3, "Beatmap/Idol/background.png", "Beatmap/Idol/audio.ogg",143));
+        trackList.add(new Track("Song2", "Artist2", 1, "Beatmap/Hey Kids/background.png", "Beatmap/Hey Kids/audio.ogg",143));
+        trackList.add(new Track("Song3", "Artist3", 2, "Beatmap/Silhouette/background.png", "Beatmap/Silhouette/audio.ogg",143));
+        trackList.add(new Track("Song4", "Artist4", 2, "Beatmap/lebron/background.png", "Beatmap/lebron/audio.ogg",143));
         trackCount=trackList.size()-1;
         l=trackCount;
+
+        title=new ArrayList<>();
+        title.add("Idol");
+        title.add("Hey Kids");
+        title.add("Silhouette");
+        title.add("lebron");
+
+        tbpPath=new ArrayList<>();
+        tbpPath.add("Beatmap/"+title.get(0)+"/dragon.tbp");
+        tbpPath.add("Beatmap/"+title.get(1)+"/dragon.tbp");
+        tbpPath.add("Beatmap/"+title.get(2)+"/dragon.tbp");
+        tbpPath.add("Beatmap/"+title.get(3)+"/dragon.tbp");
 
         buttonPlyS=new Texture("Img/box3.png");
         buttonPlyH=new Texture("Img/box4.png");
@@ -74,8 +93,6 @@ public class TrackSelection extends ScreenAdapter {
         }
         videoPlayer.setLooping(true);
     }
-
-
     private void playCenterMusic() {
         Music musicToPlay = Gdx.audio.newMusic(Gdx.files.internal(trackList.get(c).getSongFilePath()));
         if (currentMusic != null) {
@@ -85,51 +102,15 @@ public class TrackSelection extends ScreenAdapter {
         currentMusic = musicToPlay;
         currentMusic.play();
     }
-
     public void traverseRight() {
-        if(l+1>trackCount){
-            l=0;
-        }
-        else{
-            l++;
-        }
-
-        if(c+1>trackCount){
-            c=0;
-        }
-        else{
-            c++;
-        }
-
-        if(r+1>trackCount){
-            r=0;
-        }
-        else{
-            r++;
-        }
+        l = (l + 1) % (trackCount + 1);
+        c = (c + 1) % (trackCount + 1);
+        r = (r + 1) % (trackCount + 1);
     }
-
     public void traverseLeft() {
-        if(l-1<0){
-            l=trackCount;
-        }
-        else{
-            l--;
-        }
-
-        if(c-1<0){
-            c=trackCount;
-        }
-        else{
-            c--;
-        }
-
-        if(r-1<0){
-            r=trackCount;
-        }
-        else{
-            r--;
-        }
+        l = (l - 1 + trackCount + 1) % (trackCount + 1);
+        c = (c - 1 + trackCount + 1) % (trackCount + 1);
+        r = (r - 1 + trackCount + 1) % (trackCount + 1);
     }
 
     @Override
@@ -175,7 +156,7 @@ public class TrackSelection extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new LoadingScreen(game));
+                game.setScreen(new LoadingScreen(game,tbpPath.get(c),title.get(c)));
                 dispose();
             }
         });
@@ -283,5 +264,4 @@ public class TrackSelection extends ScreenAdapter {
     }
 
 }
-
 

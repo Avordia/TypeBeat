@@ -44,25 +44,20 @@ public class KeyHandling extends InputAdapter {
         if (keycode == Input.Keys.SPACE) {
             if (isLineCloseToCenter(leftLine.get(0))) {
                 if(judge==0) {
-                    score.incrementMissed();
                     score.resetCombo();
                 }
                 else if(judge==1) {
-                    score.incrementGood();
                     scorePoint(leftLine.get(0).getLetter(),'/',judge,100);
                     return true;
                 }
                 else if(judge==2) {
-                    score.incrementGreat();
                     scorePoint(leftLine.get(0).getLetter(),'/',judge,200);
                     return true;
                 }
                 else if(judge==3) {
-                    score.incrementPerfect();
                     scorePoint(leftLine.get(0).getLetter(),'/',judge,350);
                     return true;
                 }
-                score.incrementMissed();
                 deleteLines(0);
             }
         }
@@ -71,26 +66,21 @@ public class KeyHandling extends InputAdapter {
             if (isLineCloseToCenter(leftLine.get(0))) {
                 if (!checkChar(keyPressed,leftLine.get(0).getLetter())){
                     deleteLines(0);
-                    score.incrementMissed();
                     score.resetCombo();
                     return true;
                 }
                 if(judge==0) {
-                    score.incrementMissed();
                     score.resetCombo();
                 }
                 else if(judge==1) {
-                    score.incrementGood();
                     scorePoint(leftLine.get(0).getLetter(),keyPressed,judge,100);
                     return true;
                 }
                 else if(judge==2) {
-                    score.incrementGreat();
                     scorePoint(leftLine.get(0).getLetter(),keyPressed,judge,200);
                     return true;
                 }
                 else if(judge==3) {
-                    score.incrementPerfect();
                     scorePoint(leftLine.get(0).getLetter(),keyPressed,judge,350);
                     return true;
                 }
@@ -153,7 +143,7 @@ public class KeyHandling extends InputAdapter {
 
     public int judgeTiming(Line line) {
         float timing = calculateTiming(line);
-        float perfectThreshold = centerX / 10;
+        float perfectThreshold = centerX / 9;
         float greatThreshold = centerX / 7;
         float goodThreshold = centerX / 6;
 

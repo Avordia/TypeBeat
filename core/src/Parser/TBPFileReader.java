@@ -8,26 +8,6 @@ import java.util.List;
 
 public class TBPFileReader {
 
-    public static void main(String[] args) {
-        String filePath = "path/to/your/beatmap.tbp";
-        BeatmapData beatmapData = readTBPFile(filePath);
-
-        // Access the extracted data
-        if (beatmapData != null) {
-            System.out.println("Audio Path: " + beatmapData.getAudioPath());
-            System.out.println("Background Path: " + beatmapData.getBackgroundPath());
-            List<BeatData> beatDataList = beatmapData.getBeatDataList();
-            System.out.println("Number of Beats: " + beatDataList.size());
-            System.out.println("Beatmap Data:");
-            for (BeatData beatData : beatDataList) {
-                System.out.printf("SpawnTime: %.2f, BeatTime: %.2f, Letter: %c%n",
-                        beatData.getSpawnTime(), beatData.getBeatTime(), beatData.getLetter());
-            }
-        } else {
-            System.out.println("Failed to read beatmap data from the file.");
-        }
-    }
-
     public static BeatmapData readTBPFile(String filePath) {
         BeatmapData beatmapData = new BeatmapData();
 
@@ -43,10 +23,12 @@ public class TBPFileReader {
                     beatmapData.setAudioPath(line.substring("audioPath:".length()).trim());
                 } else if (line.startsWith("backgroundPath:")) {
                     beatmapData.setBackgroundPath(line.substring("backgroundPath:".length()).trim());
+                } else if (line.startsWith("musicID:")) {
+                    beatmapData.setMusicID(Integer.parseInt(line.substring("musicID:".length()).trim()));
                 } else if (line.equals("sT, bT, letter")) {
                     // Start reading beatmap data
                     List<BeatData> beatDataList = new ArrayList<>();
-                    while ((line = br.readLine()) != null && !line.isEmpty()) {
+                    while ((line = br.readLine()) != null) {
                         String[] parts = line.split(",");
                         if (parts.length == 3) {
                             float spawnTime = Float.parseFloat(parts[0].trim());
@@ -61,7 +43,6 @@ public class TBPFileReader {
             }
         } catch (IOException | NumberFormatException e) {
             e.printStackTrace();
-            return null;
         }
 
         return beatmapData;
@@ -70,6 +51,7 @@ public class TBPFileReader {
     public static class BeatmapData {
         private String audioPath;
         private String backgroundPath;
+        private int musicID;
         private List<BeatData> beatDataList;
 
         public String getAudioPath() {
@@ -86,6 +68,14 @@ public class TBPFileReader {
 
         public void setBackgroundPath(String backgroundPath) {
             this.backgroundPath = backgroundPath;
+        }
+
+        public int getMusicID() {
+            return musicID;
+        }
+
+        public void setMusicID(int musicID) {
+            this.musicID = musicID;
         }
 
         public List<BeatData> getBeatDataList() {

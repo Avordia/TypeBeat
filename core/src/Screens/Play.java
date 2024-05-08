@@ -77,9 +77,9 @@ public class Play extends ScreenAdapter {
     private final KeyHandling keyHandler;
     Score score;
     private AssetManager assetManager;
+    int musicID;
 
-    public Play(Game game, AssetManager assetManager) {
-
+    public Play(Game game, AssetManager assetManager,String tbpPath, String title) {
         assetManager.get("Img/MapSprites/perfect.png", Texture.class);
         assetManager.get("Img/MapSprites/great.png", Texture.class);
         assetManager.get("Img/MapSprites/good.png", Texture.class);
@@ -90,13 +90,12 @@ public class Play extends ScreenAdapter {
 
         this.assetManager = assetManager;
 
-        backgroundMusic = assetManager.get("assets/Beatmap/Idol/audio.ogg", Music.class);
+        backgroundMusic = assetManager.get("assets/Beatmap/"+title+"/audio.ogg", Music.class);
         player= VideoPlayerCreator.createVideoPlayer();
         kick = assetManager.get("assets/Sound/type1.wav", Sound.class);
         snare = assetManager.get("assets/Sound/type2.wav", Sound.class);
         lineTexture = assetManager.get("Img/MapSprites/line1.png", Texture.class);
-        logoPlay= new Texture("Img/logo.png");
-
+        logoPlay = new Texture("Img/logo.png");
 
         this.game = game;
         screenWidth = Gdx.graphics.getWidth();
@@ -104,8 +103,7 @@ public class Play extends ScreenAdapter {
         float centerY = screenHeight / 2;
         centerX = screenWidth/2;
 
-        String tbpFilePath = "assets/Beatmap/Idol/dragon.tbp";
-        TBPFileReader.BeatmapData beatmapData = TBPFileReader.readTBPFile(tbpFilePath);
+        TBPFileReader.BeatmapData beatmapData = TBPFileReader.readTBPFile("assets/"+tbpPath);
         String audioPath = beatmapData.getAudioPath();
         String backgroundPath = beatmapData.getBackgroundPath();
         List<TBPFileReader.BeatData> beatDataList = beatmapData.getBeatDataList();
@@ -116,14 +114,16 @@ public class Play extends ScreenAdapter {
 
         for (TBPFileReader.BeatData beatData : beatDataList) {
             float spawnTime = beatData.getSpawnTime()+2.4f; //Calibrators
-            float beatTime = beatData.getBeatTime()+2.4f; //Calibrators
+            float beatTime = beatData.getBeatTime()+2.4F; //Calibrators
             char letter = beatData.getLetter();
 
             beatTimes.add(beatTime);
             spawnTimes.add(spawnTime);
             letterList.add(letter);
         }
+
         spawnTimes.set(0,2.5f);
+        musicID= beatmapData.getMusicID();
 
         wordList=new ArrayList<>();
         /*-------------------STRING BUILDER------------------------*/
@@ -156,14 +156,12 @@ public class Play extends ScreenAdapter {
         leftLine = new ArrayList<>();
         rightLine = new ArrayList<>();
 
-
         score = new Score();
         elapsedTime = 0f;
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Beatmap/Idol/audio.ogg"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Beatmap/"+title+"/audio.ogg"));
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.setLooping(false);
-        backgroundMusic.pause();
 
         this.kick = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/type1.wav"));
         this.snare = Gdx.audio.newSound(Gdx.files.internal("assets/Sound/type2.wav"));
@@ -269,19 +267,19 @@ public class Play extends ScreenAdapter {
                 float remainingTime = line.getBeatTime() - elapsedTime;
                 float speed = distanceToTravel / remainingTime;
 
-                lineBatch.draw(line.getTexture(), line.getX(), line.getY());
+                lineBatch.draw(line.getTexture(), line.getX(), line.getY(),line.getTexture().getWidth(), screenHeight);
                 line.setX(line.getX() + speed * delta);
 
                 if (line.getX() >= centerX) {
                     if (leftLine.get(0).getLineType() == 2) {
                         keyHandler.incrementColorCount();
+                        for(int j=0; j<wordList.get(0).length(); j++){
+                            isDead.remove(0);
+                        }
                         keyHandler.setDeath(0);
                         wordList.remove(0);
                         if (!leftLine.isEmpty()) {
                             leftLine.remove(0);
-                        }
-                        for(int j=0; j<wordList.get(0).length(); j++){
-                            isDead.remove(0);
                         }
                     }
                     else {
@@ -301,15 +299,10 @@ public class Play extends ScreenAdapter {
                 float remainingTime = line.getBeatTime() - elapsedTime;
                 float speed = distanceToTravel / remainingTime;
 
-                lineBatch.draw(line.getTexture(), line.getX(), line.getY());
+                lineBatch.draw(line.getTexture(), line.getX(), line.getY(),line.getTexture().getWidth(), screenHeight);
                 line.setX(line.getX() - speed * delta);
 
                 if (line.getX() <= centerX) {
-                    rightLine.remove(i);
-                    i--;
-                    score.resetCombo();
-                }
-                if(line.getX()<=centerX-30){
                     rightLine.remove(i);
                     i--;
                     score.resetCombo();
@@ -393,11 +386,6 @@ public class Play extends ScreenAdapter {
 
         textBatch.end();
 
-        if(leftLine.isEmpty()){
-            backgroundMusic.stop();
-            game.setScreen(new ScoreScreen(game,score.getScore(), noteCount));
-        }
-
     }
 
     @Override
@@ -409,6 +397,12 @@ public class Play extends ScreenAdapter {
         shapeAccentColor.dispose();
         player.dispose();
         shaderProgram.dispose();
+        backgroundMusic.dispose();
+        kick.dispose();
+        snare.dispose();
+        lineTexture.dispose();
+        logoPlay.dispose();
+        space.dispose();
     }
 
 
