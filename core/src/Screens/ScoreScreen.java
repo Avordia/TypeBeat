@@ -47,7 +47,7 @@ public class ScoreScreen extends ScreenAdapter {
     private int bestScore;
     String musicTitle;
 
-    Connection con;
+    Connection con=null;
 
     public ScoreScreen(Game game, int score, int noteCount, int userID, int mapID){
         this.game = game;
@@ -87,6 +87,7 @@ public class ScoreScreen extends ScreenAdapter {
             con = DriverManager.getConnection(url, username, password);
 
         } catch (Exception e) {
+            System.out.println("Error: " + e);
         }
     }
 
