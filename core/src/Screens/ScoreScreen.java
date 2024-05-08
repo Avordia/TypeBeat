@@ -170,7 +170,7 @@
 
             try {
 
-                String insertQuery = "INSERT INTO scores (userID, mapID, scores) VALUES (?, ?, ?)";
+                String insertQuery = "INSERT INTO highscores (userID, mapID, scores) VALUES (?, ?, ?)";
                 PreparedStatement ps = con.prepareStatement(insertQuery);
                 ps.setInt(1, userID);
                 ps.setInt(2, mapID);
