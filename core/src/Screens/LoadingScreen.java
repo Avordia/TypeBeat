@@ -30,8 +30,10 @@ public class LoadingScreen extends ScreenAdapter {
     private BitmapFont font;
     private AssetManager assetManager;
     float elapsedTime;
+    private String tbpPath;
+    private String title;
 
-    public LoadingScreen(Game game) {
+    public LoadingScreen(Game game, String tbpPath,String title) {
         this.game = game;
         try {
             videoPlayer.play(backgroundVid);
@@ -39,6 +41,8 @@ public class LoadingScreen extends ScreenAdapter {
             throw new RuntimeException(e);
         }
         videoPlayer.setLooping(true);
+        this.tbpPath=tbpPath;
+        this.title=title;
     }
 
     @Override
@@ -49,7 +53,7 @@ public class LoadingScreen extends ScreenAdapter {
         font.setColor(Color.WHITE);
 
         assetManager = new AssetManager();
-        assetManager.load("assets/Beatmap/Idol/audio.ogg", Music.class);
+        assetManager.load("assets/Beatmap/"+title+"/audio.ogg", Music.class);
         assetManager.load("assets/Sound/type1.wav", Sound.class);
         assetManager.load("assets/Sound/type2.wav", Sound.class);
         assetManager.load("Img/MapSprites/line1.png", Texture.class);
@@ -92,7 +96,7 @@ public class LoadingScreen extends ScreenAdapter {
         batch.end();
 
         if (assetManager.update() && elapsedTime>=2) {
-            game.setScreen(new Play(game, assetManager));
+            game.setScreen(new Play(game, assetManager,tbpPath, title));
         };
     }
 

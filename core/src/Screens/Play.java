@@ -77,9 +77,9 @@ public class Play extends ScreenAdapter {
     private final KeyHandling keyHandler;
     Score score;
     private AssetManager assetManager;
+    int musicID;
 
-    public Play(Game game, AssetManager assetManager) {
-
+    public Play(Game game, AssetManager assetManager,String tbpPath, String title) {
         assetManager.get("Img/MapSprites/perfect.png", Texture.class);
         assetManager.get("Img/MapSprites/great.png", Texture.class);
         assetManager.get("Img/MapSprites/good.png", Texture.class);
@@ -90,13 +90,12 @@ public class Play extends ScreenAdapter {
 
         this.assetManager = assetManager;
 
-        backgroundMusic = assetManager.get("assets/Beatmap/Idol/audio.ogg", Music.class);
+        backgroundMusic = assetManager.get("assets/Beatmap/"+title+"/audio.ogg", Music.class);
         player= VideoPlayerCreator.createVideoPlayer();
         kick = assetManager.get("assets/Sound/type1.wav", Sound.class);
         snare = assetManager.get("assets/Sound/type2.wav", Sound.class);
         lineTexture = assetManager.get("Img/MapSprites/line1.png", Texture.class);
-        logoPlay= new Texture("Img/logo.png");
-
+        logoPlay = new Texture("Img/logo.png");
 
         this.game = game;
         screenWidth = Gdx.graphics.getWidth();
@@ -104,8 +103,7 @@ public class Play extends ScreenAdapter {
         float centerY = screenHeight / 2;
         centerX = screenWidth/2;
 
-        String tbpFilePath = "assets/Beatmap/Idol/dragon.tbp";
-        TBPFileReader.BeatmapData beatmapData = TBPFileReader.readTBPFile(tbpFilePath);
+        TBPFileReader.BeatmapData beatmapData = TBPFileReader.readTBPFile("assets/"+tbpPath);
         String audioPath = beatmapData.getAudioPath();
         String backgroundPath = beatmapData.getBackgroundPath();
         List<TBPFileReader.BeatData> beatDataList = beatmapData.getBeatDataList();
@@ -123,7 +121,9 @@ public class Play extends ScreenAdapter {
             spawnTimes.add(spawnTime);
             letterList.add(letter);
         }
+
         spawnTimes.set(0,2.5f);
+        musicID= beatmapData.getMusicID();
 
         wordList=new ArrayList<>();
         /*-------------------STRING BUILDER------------------------*/
@@ -156,11 +156,10 @@ public class Play extends ScreenAdapter {
         leftLine = new ArrayList<>();
         rightLine = new ArrayList<>();
 
-
         score = new Score();
         elapsedTime = 0f;
 
-        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Beatmap/Idol/audio.ogg"));
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("Beatmap/"+title+"/audio.ogg"));
         backgroundMusic.setVolume(0.5f);
         backgroundMusic.setLooping(false);
 
@@ -204,7 +203,6 @@ public class Play extends ScreenAdapter {
 
     @Override
     public void show(){
-
         for(int i=0; i<noteCount;i++){
             float spawnLocationL = -lineTexture.getWidth();
             float spawnLocationR = screenWidth;

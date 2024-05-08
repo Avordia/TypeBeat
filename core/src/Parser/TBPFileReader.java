@@ -23,6 +23,8 @@ public class TBPFileReader {
                     beatmapData.setAudioPath(line.substring("audioPath:".length()).trim());
                 } else if (line.startsWith("backgroundPath:")) {
                     beatmapData.setBackgroundPath(line.substring("backgroundPath:".length()).trim());
+                } else if (line.startsWith("musicID:")) {
+                    beatmapData.setMusicID(Integer.parseInt(line.substring("musicID:".length()).trim()));
                 } else if (line.equals("sT, bT, letter")) {
                     // Start reading beatmap data
                     List<BeatData> beatDataList = new ArrayList<>();
@@ -49,6 +51,7 @@ public class TBPFileReader {
     public static class BeatmapData {
         private String audioPath;
         private String backgroundPath;
+        private int musicID;
         private List<BeatData> beatDataList;
 
         public String getAudioPath() {
@@ -65,6 +68,14 @@ public class TBPFileReader {
 
         public void setBackgroundPath(String backgroundPath) {
             this.backgroundPath = backgroundPath;
+        }
+
+        public int getMusicID() {
+            return musicID;
+        }
+
+        public void setMusicID(int musicID) {
+            this.musicID = musicID;
         }
 
         public List<BeatData> getBeatDataList() {

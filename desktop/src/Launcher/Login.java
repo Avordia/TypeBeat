@@ -179,8 +179,6 @@ public class Login extends JFrame {
         // TODO add your handling code here:
 
             try {
-
-
                 String username = txtUsername.getText();
                 char[] passcode = txtPassword.getPassword();
                 String password = String.valueOf(passcode);
@@ -202,7 +200,8 @@ public class Login extends JFrame {
                         JOptionPane.showMessageDialog(this, "Login Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
                         this.setVisible(false);
                         this.dispose();
-                        DesktopLauncher.main(new String[] {});
+                        String user = txtUsername.getText();
+                        DesktopLauncher.main(new String[] {user});
                         // Additional logic after successful login can be added here
                     } else {
                         JOptionPane.showMessageDialog(this, "Login Failed. Incorrect Username or Password", "Error", JOptionPane.ERROR_MESSAGE);
