@@ -1,0 +1,14 @@
+musicPath: audio.mp3
+imagePath: background.png
+
+Time:
+beattime, spawntime, character
+1.0f, 0.5f, T
+2.0f, 0.5f, Y
+3.0f, 0.5f, P
+4.0f, 1.0f, E
+5.0f, 1.0f, /
+6.0f, 5.0f, B
+7.0f, 5.0f, E
+8.0f, 6.0f, A
+9.0f, 6.0f, T
