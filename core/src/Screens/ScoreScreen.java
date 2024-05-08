@@ -272,6 +272,29 @@ public class ScoreScreen extends ScreenAdapter {
         return bestPlayer;
     }
 
+    //getters for userID
+    public int getUserID (String username) {
+        connectionDB();
+
+        userID = -1;
+
+        try {
+            Statement st = con.createStatement();
+
+            String selectUserID = "SELECT userID FROM login WHERE username = " + username;
+            ResultSet rs = st.executeQuery(selectUserID);
+
+            if (rs.next()) {
+                userID = rs.getInt("userID");
+
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+
+        return userID;
+    }
+
 
     @Override
     public void hide() {
