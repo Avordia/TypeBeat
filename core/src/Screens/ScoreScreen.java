@@ -73,6 +73,8 @@ public class ScoreScreen extends ScreenAdapter {
 
         int id=1;
         String musicTitle="Idol";
+
+        connectionDB();
     }
 
     public void connectionDB () {
