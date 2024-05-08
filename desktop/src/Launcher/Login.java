@@ -195,6 +195,10 @@ public class Login extends JFrame {
                     preparedStatement.setString(1, username);
                     preparedStatement.setString(2, password);
                     ResultSet result = preparedStatement.executeQuery();
+                    /*
+
+                     "SELECT title FROM score where mapID = "'mapID'"
+                    */
 
                     if (result.next()) {
                         JOptionPane.showMessageDialog(this, "Login Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
