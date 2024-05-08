@@ -13,9 +13,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
 import java.sql.*;
@@ -47,6 +55,10 @@ public class ScoreScreen extends ScreenAdapter {
     private String testBestPlayerScore;
     private String testBestScore;
     private int userID;
+    Button btnPlay;
+    private Texture buttonPlyS;
+    private Texture buttonPlyH;
+    private Stage stage;
 
     Connection con=null;
 
@@ -64,6 +76,8 @@ public class ScoreScreen extends ScreenAdapter {
             throw new RuntimeException(e);
         }
         videoPlayer.setLooping(true);
+        buttonPlyS=new Texture("Img/box3.png");
+        buttonPlyH=new Texture("Img/box4.png");
 
         FreeTypeFontGenerator scoreFont = new FreeTypeFontGenerator(Gdx.files.internal("Franklin Gothic Heavy Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameterScore= new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -79,7 +93,8 @@ public class ScoreScreen extends ScreenAdapter {
         testUserScore = getUserScoreSQL();
         testBestScore = getBestScoreSQL();
         testBestPlayerScore = getBestPlayerNameSQL();
-
+        stage =new Stage();
+        btnPlay = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/Play0.png"))));
     }
 
     public void connectionDB () {
@@ -105,6 +120,9 @@ public class ScoreScreen extends ScreenAdapter {
         font = new BitmapFont();
         font.setColor(Color.WHITE);
 
+        float oW = 80;
+        float oH = 34;
+
         assetManager = new AssetManager();
         assetManager.load("assets/Beatmap/Idol/audio.ogg", Music.class);
         assetManager.load("assets/Sound/type1.wav", Sound.class);
@@ -121,6 +139,30 @@ public class ScoreScreen extends ScreenAdapter {
         System.out.println("1 " + testUserScore);
         System.out.println("2 " + testBestScore);
         System.out.println("3 " + testBestPlayerScore);
+        TextureRegionDrawable btnPlayN = new TextureRegionDrawable(new TextureRegion(buttonPlyS));
+        TextureRegionDrawable btnPlayH = new TextureRegionDrawable(new TextureRegion(buttonPlyH));
+        stage.addActor(btnPlay);
+        btnPlay.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, com.badlogic.gdx.scenes.scene2d.Actor fromActor) {
+                // Change button texture on mouse hover
+                btnPlay.getStyle().up = btnPlayH;
+                btnPlay.addAction(Actions.sizeTo(oW * 1.2f, oH * 1.2f, 0.2f, Interpolation.smooth));
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, com.badlogic.gdx.scenes.scene2d.Actor toActor) {
+                // Revert button texture when mouse exits
+                btnPlay.getStyle().up = btnPlayN;
+                btnPlay.addAction(Actions.sizeTo(oW, oH, 0.2f, Interpolation.smooth));
+            }
+
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                insertScore();
+            }
+        });
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
@@ -162,6 +204,8 @@ public class ScoreScreen extends ScreenAdapter {
         /*----------------------------------------MGA TEST CASE--------------------------------*/
 
         batch.end();
+        stage.act(delta);
+        stage.draw();
     }
 
     // sa Map na table, e add si Idol. Iyang MusicID kay 1.
