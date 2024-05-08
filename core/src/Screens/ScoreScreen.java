@@ -18,10 +18,14 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
-import java.sql.*;
+//import com.sun.java.swing.action.StateChangeAction;
 import org.w3c.dom.Text;
+import javax.swing.*;
+import javax.swing.plaf.nimbus.State;
+import java.sql.*;
 
 import java.io.FileNotFoundException;
+import java.sql.Connection;
 
 public class ScoreScreen extends ScreenAdapter {
     VideoPlayer videoPlayer= VideoPlayerCreator.createVideoPlayer();
@@ -29,6 +33,8 @@ public class ScoreScreen extends ScreenAdapter {
     ShaderProgram shaderProgram = new ShaderProgram(Gdx.files.internal("Shader/default.vert"), Gdx.files.internal("Shader/color_tint_shader.frag"));
     Texture logo;
     ShapeRenderer shapeRenderer;
+
+
     private BitmapFont lblScore;
     private final Game game;
     private SpriteBatch batch;
@@ -42,22 +48,21 @@ public class ScoreScreen extends ScreenAdapter {
     private int animatedScore=0;
     private GlyphLayout glyph = new GlyphLayout();
     int id;
+    String musicTitle;
     private int userID;
     private int mapID;
     private int bestScore;
-    String musicTitle;
-    
+
     String testUserScore;
     String testBestPlayerScore;
     String testBestScore;
 
-    Connection con=null;
+    Connection con = null;
 
-    public ScoreScreen(Game game, int score, int noteCount, int userID, int mapID){
+
+    public ScoreScreen(Game game, int score, int noteCount){
         this.game = game;
         this.score = score;
-        this.userID = userID;
-        this.mapID = mapID;
         for(int i=0; i<noteCount;i++){
             maximumScore+=350*noteCount;
         }
@@ -82,23 +87,7 @@ public class ScoreScreen extends ScreenAdapter {
 
         testUserScore=getUserScoreSQL();
         testBestPlayerScore=getBestPlayerSQL();
-        testBestScore=+getBestScoreSQL();
-    }
-
-    public void connectionDB () {
-        try {
-
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            String url = "jdbc:mysql://localhost:3306/typebeat_db"; // database declaration
-            String username = "root";
-            String password = "";
-
-            con = DriverManager.getConnection(url, username, password);
-
-        } catch (Exception e) {
-            System.out.println("Error: " + e);
-        }
+        testBestScore=getBestScoreSQL();
     }
 
 
@@ -166,25 +155,54 @@ public class ScoreScreen extends ScreenAdapter {
         batch.end();
     }
 
+    //sql database connection
+    public void connectionDB () {
+        try {
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            String url = "jdbc:mysql://localhost:3306/typebeat_db"; // database declaration
+            String username = "root";
+            String password = "";
+
+            con = DriverManager.getConnection(url, username, password);
+
+            //extra checker if connected naba sa database
+            if (con != null && !con.isClosed()) {
+                System.out.println("Connected to the database successfully!");
+            } else {
+                System.out.println("Failed to connect to the database.");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+
+
     // sa Map na table, e add si Idol. Iyang MusicID kay 1.
     public void insertScore(){
         connectionDB();
 
         try {
+            Statement st = con.createStatement();
 
-            String insertQuery = "INSERT INTO scores (userID, mapID, scores) VALUES (?, ?, ?)";
-            PreparedStatement ps = con.prepareStatement(insertQuery);
-            ps.setInt(1, userID);
-            ps.setInt(2, mapID);
-            ps.setInt(3, score);
+            String insertQuery = "INSERT INTO highscores (userID, mapID, scores) VALUES (" + userID + ", " + mapID + ", " + score + ")";
+            int rows = st.executeUpdate(insertQuery);
 
-            ps.executeUpdate();
+            //checker if na insert ang data
+            if (rows > 0) {
+                System.out.println("Records inserted Successfully!");
+            } else {
+                System.out.println("Failed to insert records");
+            }
+
 
             System.out.println("Score inserted Successfully!");
 
-
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error: " + e);
         }
 
         //Goal ani kay mu insert iyang score sa Score table.
@@ -208,13 +226,13 @@ public class ScoreScreen extends ScreenAdapter {
 
 
             if (rs.next()) {
-                score = rs.getInt("scores");
+                score = rs.getInt(1); //changed to column index instead of column name
                 scoreString = String.valueOf(score);
 
             }
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error: " + e);
         }
 
         //insert logic sa pagkuha sa score
@@ -235,12 +253,12 @@ public class ScoreScreen extends ScreenAdapter {
             ResultSet rs = st.executeQuery(selectBestScore);
 
             if(rs.next()){
-                bestScore = rs.getInt("scores");
+                bestScore = rs.getInt(1); //changed to column index instead of column name
                 bestScoreString = String.valueOf(bestScore);
             }
 
         }catch (Exception e){
-            System.out.println(e);
+            System.out.println("Error: " + e);
         }
 
         //goal ninyo ani kay e return ang highest score sa kana na map.
@@ -259,7 +277,7 @@ public class ScoreScreen extends ScreenAdapter {
             Statement st = con.createStatement();
 
             String selectBestPlayer = "SELECT l.firstname " +
-                    "FROM scores AS s " +
+                    "FROM highscores AS s " +
                     "INNER JOIN login AS l ON s.userID = l.userID " +
                     "WHERE s.mapID = " + mapID + " " +
                     "ORDER BY s.scores DESC " +
@@ -271,7 +289,7 @@ public class ScoreScreen extends ScreenAdapter {
 
             }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Error: " + e);
         }
         //goal ninyo ani kay e return ang player na naay highest score sa kana na map.
         //pwede ra mo mag add ug lain row sa SQL para testing basta e remove basta succesful na ang testing.
@@ -302,6 +320,7 @@ public class ScoreScreen extends ScreenAdapter {
 
         return userID;
     }
+
 
 
     @Override
