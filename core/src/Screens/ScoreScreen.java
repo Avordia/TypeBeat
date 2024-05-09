@@ -254,7 +254,7 @@ public class ScoreScreen extends ScreenAdapter {
         try {
             Statement st = con.createStatement();
 
-            String selectScore = "SELECT scores FROM highscores WHERE userID = " + userID;
+            String selectScore = "SELECT MAX(scores) FROM highscores WHERE userID = " + userID;
             ResultSet rs = st.executeQuery(selectScore);
 
 

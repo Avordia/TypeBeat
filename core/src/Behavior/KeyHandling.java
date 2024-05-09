@@ -133,8 +133,12 @@ public class KeyHandling extends InputAdapter {
         deadLines++;
     }
 
+    private float getDeletionThreshold() {
+        float thresholdMultiplier = 3.50f;
+        return centerX / thresholdMultiplier;
+    }
     private boolean isLineCloseToCenter(Line line) {
-        return calculateTiming(line) <= centerX / 2.5;
+        return calculateTiming(line) <= getDeletionThreshold();
     }
 
     private float calculateTiming(Line line) {

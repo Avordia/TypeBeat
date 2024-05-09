@@ -276,9 +276,12 @@ public class Play extends ScreenAdapter {
                 if (line.getX() >= centerX) {
                     if (leftLine.get(0).getLineType() == 2) {
                         keyHandler.incrementColorCount();
+                        //------------------------
                         for(int j=0; j<wordList.get(0).length(); j++){
                             isDead.remove(0);
                         }
+                        //------------------------
+
                         keyHandler.setDeath(0);
                         wordList.remove(0);
                         if (!leftLine.isEmpty()) {

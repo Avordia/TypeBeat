@@ -135,10 +135,10 @@ public class TrackSelection extends ScreenAdapter {
         buttonPlyH=new Texture("Img/box4.png");
         userID=getUserID();
         userScore = new ArrayList<>();
-        userScore.add(getUserScoreSQL(1));
-        userScore.add(getUserScoreSQL(2));
-        userScore.add(getUserScoreSQL(3));
-        userScore.add(getUserScoreSQL(4));
+        userScore.add(getUserBestScoreSQL(1));
+        userScore.add(getUserBestScoreSQL(2));
+        userScore.add(getUserBestScoreSQL(3));
+        userScore.add(getUserBestScoreSQL(4));
 
         text=new SpriteBatch();
     }
@@ -302,7 +302,7 @@ public class TrackSelection extends ScreenAdapter {
         float logoWidth = logo.getWidth() * 0.35f;
         float logoHeight = logo.getHeight() * 0.35f;
         float logoX = (screenWidth - logoWidth) / 2;
-        float logoY = screenHeight-240;
+        float logoY = screenHeight-200;
         text.draw(logo, logoX, logoY, logoWidth, logoHeight);
         text.end();
     }
@@ -362,26 +362,26 @@ public class TrackSelection extends ScreenAdapter {
         }
     }
 
-    public int getUserScoreSQL(int mapID) {
+    public int getUserBestScoreSQL(int mapID) {
         connectionDB();
-        int userScore = 0;
-        String scoreString = "";
+        int userBestScore = 0;
         try {
             Statement st = con.createStatement();
 
-            String selectScore = "SELECT scores FROM highscores WHERE userID = " + userID + " AND mapID = " + mapID;
-            ResultSet rs = st.executeQuery(selectScore);
+            String selectBestScore = "SELECT MAX(scores) AS max_score FROM highscores WHERE userID = '" + userID + "' AND mapID = '" + mapID + "'";
+            ResultSet rs = st.executeQuery(selectBestScore);
 
             if (rs.next()) {
-                userScore = rs.getInt("scores");
+                userBestScore = rs.getInt("max_score");
             }
 
         } catch (Exception e) {
             System.out.println(e);
         }
 
-        return userScore;
+        return userBestScore;
     }
+
 
     public int getBestScoreSQL(int mapID){  // WORKS
         connectionDB();
