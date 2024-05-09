@@ -5,9 +5,12 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -17,8 +20,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.video.VideoPlayer;
+import com.badlogic.gdx.video.VideoPlayerCreator;
+
+import java.io.FileNotFoundException;
 
 public class Menu extends ScreenAdapter {
+	VideoPlayer videoPlayer = VideoPlayerCreator.createVideoPlayer();
+	FileHandle backgroundVid =  Gdx.files.internal("Video/bg1.webm");
+	ShaderProgram shaderProgram = new ShaderProgram(Gdx.files.internal("Shader/default.vert"), Gdx.files.internal("Shader/color_tint_shader.frag"));
 	SpriteBatch batch;
 	Texture logo;
 	Texture background;
@@ -30,8 +40,12 @@ public class Menu extends ScreenAdapter {
 	Stage stage;
 	Game game;
 	ShapeRenderer shapeRenderer;
-	public Menu(Game game) {
+	String username;
+	SpriteBatch backgroundBatch;
+	public Menu(Game game, String username) {
 		this.game = game;
+		this.username=username;
+		backgroundBatch=new SpriteBatch();
 	}
 	@Override
 	public void show(){
@@ -90,7 +104,7 @@ public class Menu extends ScreenAdapter {
 
 			@Override
 			public void clicked(InputEvent event, float x, float y) {
-				game.setScreen(new TrackSelection(game));
+				game.setScreen(new TrackSelection(game,username));
 				dispose();
 			}
 		});
@@ -143,6 +157,12 @@ public class Menu extends ScreenAdapter {
 		stage.addActor(btnSettings);
 		stage.addActor(btnShop);
 		Gdx.input.setInputProcessor(stage);
+		try {
+			videoPlayer.play(backgroundVid);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+		videoPlayer.setLooping(true);
 
 		/* ------------------------------------- END OF BUTTON SECTION ---------------------------------------*/
 
@@ -156,6 +176,22 @@ public class Menu extends ScreenAdapter {
 	@Override
 	public void render(float delta) {
 		ScreenUtils.clear(1, 0, 0, 1);
+
+		videoPlayer.update();
+		backgroundBatch.setShader(shaderProgram);
+		if (shaderProgram != null && shaderProgram.isCompiled()) {
+			shaderProgram.begin();
+			shaderProgram.setUniformf("u_tint", Color.ORANGE);
+		}
+
+		backgroundBatch.begin();
+		backgroundBatch.draw(videoPlayer.getTexture(),0,0);
+		backgroundBatch.end();
+
+		if (shaderProgram != null && shaderProgram.isCompiled()) {
+			shaderProgram.end();
+		}
+		backgroundBatch.setShader(null);
 
 		float screenWidth = Gdx.graphics.getWidth();
 		float screenHeight = Gdx.graphics.getHeight();
@@ -174,7 +210,6 @@ public class Menu extends ScreenAdapter {
 		stage.act((Gdx.graphics.getDeltaTime()));
 
 		batch.begin();
-		batch.draw(background, 0, 0, scaledWidth, scaledHeight);
 		batch.draw(logo, logoX, logoY, logoWidth, logoHeight);
 		batch.end();
 		stage.draw();
@@ -193,5 +228,6 @@ public class Menu extends ScreenAdapter {
 		logo.dispose();
 		background.dispose();
 		stage.dispose();
+		videoPlayer.dispose();
 	}
 }

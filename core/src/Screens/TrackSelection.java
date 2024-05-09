@@ -7,11 +7,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Interpolation;
@@ -24,20 +22,28 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 import GameDat.Track;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.video.VideoPlayer;
 import com.badlogic.gdx.video.VideoPlayerCreator;
 
 import java.io.FileNotFoundException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 
+
 public class TrackSelection extends ScreenAdapter {
-    VideoPlayer videoPlayer= VideoPlayerCreator.createVideoPlayer();
-    FileHandle backgroundVid =  Gdx.files.internal("Video/bg1.webm");
+    VideoPlayer videoPlayer;
+    FileHandle backgroundVid;
     ShaderProgram shaderProgram = new ShaderProgram(Gdx.files.internal("Shader/default.vert"), Gdx.files.internal("Shader/color_tint_shader.frag"));
     SpriteBatch background = new SpriteBatch();
     Texture logo;
-
+    Connection con=null;
+    SpriteBatch text;
+    BitmapFont lblTitle;
     private final float screenWidth=Gdx.graphics.getWidth();
     private final float screenHeight=Gdx.graphics.getHeight();
     private ShapeRenderer shapeRenderer;
@@ -45,12 +51,15 @@ public class TrackSelection extends ScreenAdapter {
     private Stage stage;
     private Texture buttonPlyS;
     private Texture buttonPlyH;
-    private BitmapFont lblTitle;
+    private BitmapFont lblScore;
     private GlyphLayout layout;
     private SpriteBatch batch;
     private ArrayList<Track> trackList;
     private ArrayList<String> tbpPath;
     private ArrayList<String> title;
+    ArrayList<Integer> userScore;
+    ArrayList<Integer> bestScore;
+    ArrayList<String> bestUser;
     Button btnPrev;
     Button btnNext;
     int l;
@@ -61,9 +70,14 @@ public class TrackSelection extends ScreenAdapter {
     int colorCount=0;
 
     Button btnPlay;
+    String username;
+    int userID;
 
-    public TrackSelection(Game game) { //Add tracks here
+    public TrackSelection(Game game, String username) { //Add tracks here
         this.game=game;
+        this.username=username;
+        logo = new Texture("Img/logo.png");
+        layout=new GlyphLayout();
         trackList = new ArrayList<Track>();
         trackList.add(new Track("Song1", "Artist1", 3, "Beatmap/Idol/background.png", "Beatmap/Idol/audio.ogg",143));
         trackList.add(new Track("Song2", "Artist2", 1, "Beatmap/Hey Kids/background.png", "Beatmap/Hey Kids/audio.ogg",143));
@@ -71,6 +85,15 @@ public class TrackSelection extends ScreenAdapter {
         trackList.add(new Track("Song4", "Artist4", 2, "Beatmap/lebron/background.png", "Beatmap/lebron/audio.ogg",143));
         trackCount=trackList.size()-1;
         l=trackCount;
+
+        videoPlayer= new VideoPlayerCreator().createVideoPlayer();
+        backgroundVid=Gdx.files.internal("Video/bg1.webm");
+        try {
+            videoPlayer.play(backgroundVid);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        videoPlayer.setLooping(true);
 
         title=new ArrayList<>();
         title.add("Idol");
@@ -84,14 +107,40 @@ public class TrackSelection extends ScreenAdapter {
         tbpPath.add("Beatmap/"+title.get(2)+"/dragon.tbp");
         tbpPath.add("Beatmap/"+title.get(3)+"/dragon.tbp");
 
+
+        bestUser=new ArrayList<>();
+        bestUser.add(getBestPlayerNameSQL(1));
+        bestUser.add(getBestPlayerNameSQL(2));
+        bestUser.add(getBestPlayerNameSQL(3));
+        bestUser.add(getBestPlayerNameSQL(4));
+
+        bestScore = new ArrayList<>();
+        bestScore.add(getBestScoreSQL(1));
+        bestScore.add(getBestScoreSQL(2));
+        bestScore.add(getBestScoreSQL(3));
+        bestScore.add(getBestScoreSQL(4));
+
+        FreeTypeFontGenerator scoreFont = new FreeTypeFontGenerator(Gdx.files.internal("Franklin Gothic Heavy Regular.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter parameterScore= new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameterScore.size=15;
+
+        FreeTypeFontGenerator.FreeTypeFontParameter parameterTitle= new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameterTitle.size=80;
+
+        lblScore = scoreFont.generateFont(parameterScore);
+        lblTitle= scoreFont.generateFont(parameterTitle);
+
+
         buttonPlyS=new Texture("Img/box3.png");
         buttonPlyH=new Texture("Img/box4.png");
-        try {
-            videoPlayer.play(backgroundVid);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        videoPlayer.setLooping(true);
+        userID=getUserID();
+        userScore = new ArrayList<>();
+        userScore.add(getUserScoreSQL(1));
+        userScore.add(getUserScoreSQL(2));
+        userScore.add(getUserScoreSQL(3));
+        userScore.add(getUserScoreSQL(4));
+
+        text=new SpriteBatch();
     }
     private void playCenterMusic() {
         Music musicToPlay = Gdx.audio.newMusic(Gdx.files.internal(trackList.get(c).getSongFilePath()));
@@ -118,7 +167,7 @@ public class TrackSelection extends ScreenAdapter {
         batch = new SpriteBatch();
         stage = new Stage();
         shapeRenderer = new ShapeRenderer();
-
+        System.out.println(userID);
         float oW = 80;
         float oH = 34;
 
@@ -156,7 +205,7 @@ public class TrackSelection extends ScreenAdapter {
 
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new LoadingScreen(game,tbpPath.get(c),title.get(c)));
+                game.setScreen(new LoadingScreen(game,tbpPath.get(c),title.get(c),username));
                 dispose();
             }
         });
@@ -197,6 +246,7 @@ public class TrackSelection extends ScreenAdapter {
             }
         });
         Gdx.input.setInputProcessor(stage);
+
     }
 
     @Override
@@ -236,20 +286,53 @@ public class TrackSelection extends ScreenAdapter {
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         shapeRenderer.setColor(Color.BLACK);
 
-        shapeRenderer.rect(0,0,screenWidth,100);
-        shapeRenderer.rect(0,screenHeight-100,screenWidth,100);
+        shapeRenderer.rect(0,0,screenWidth,200);
+        shapeRenderer.rect(0,screenHeight-200,screenWidth,200);
         shapeRenderer.end();
 
         stage.act(delta);
         stage.draw();
+
+        text.begin();
+        lblScore.draw(text,"Best Player: "+bestUser.get(c)+" ["+bestScore.get(c)+"]",150,50);
+        lblScore.draw(text,"Your Score: "+userScore.get(c),150,90);
+        layout.setText(lblTitle, title.get(c));
+        float titleX = (Gdx.graphics.getWidth() - layout.width) / 2;
+        lblTitle.draw(text, layout, titleX, 160);
+        float logoWidth = logo.getWidth() * 0.35f;
+        float logoHeight = logo.getHeight() * 0.35f;
+        float logoX = (screenWidth - logoWidth) / 2;
+        float logoY = screenHeight-240;
+        text.draw(logo, logoX, logoY, logoWidth, logoHeight);
+        text.end();
     }
 
     @Override
-    public void dispose(){
+    public void dispose() {
+        background.dispose();
         shapeRenderer.dispose();
         stage.dispose();
         batch.dispose();
+
+        buttonPlyS.dispose();
+        buttonPlyH.dispose();
+        logo.dispose();
+
+        videoPlayer.dispose();
+
+        lblScore.dispose();
+        lblTitle.dispose();
+        if (currentMusic != null) {
+            currentMusic.stop();
+            currentMusic.dispose();
+        }
+
+        if (shaderProgram != null) {
+            shaderProgram.dispose();
+        }
+
     }
+
 
     @Override
     public void hide() {
@@ -261,6 +344,110 @@ public class TrackSelection extends ScreenAdapter {
         if(colorCount==3){
             colorCount=0;
         }
+    }
+
+    public void connectionDB () {
+        try {
+
+            Class.forName("com.mysql.cj.jdbc.Driver");
+
+            String url = "jdbc:mysql://localhost:3306/typebeat_db"; // database declaration
+            String username = "root";
+            String password = "";
+
+            con = DriverManager.getConnection(url, username, password);
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+    }
+
+    public int getUserScoreSQL(int mapID) {
+        connectionDB();
+        int userScore = 0;
+        String scoreString = "";
+        try {
+            Statement st = con.createStatement();
+
+            String selectScore = "SELECT scores FROM highscores WHERE userID = " + userID + " AND mapID = " + mapID;
+            ResultSet rs = st.executeQuery(selectScore);
+
+            if (rs.next()) {
+                userScore = rs.getInt("scores");
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return userScore;
+    }
+
+    public int getBestScoreSQL(int mapID){  // WORKS
+        connectionDB();
+        int userBestScore = 0;
+        String bestScoreString = "";
+
+        try{
+            Statement st = con.createStatement();
+
+            String selectBestScore = "SELECT MAX(scores) FROM highscores WHERE mapID = " + mapID;
+            ResultSet rs = st.executeQuery(selectBestScore);
+
+            if(rs.next()){
+                userBestScore = rs.getInt(1);
+            }
+
+        }catch (Exception e){
+            System.out.println(e);
+        }
+
+        return userBestScore;
+    }
+
+    public String getBestPlayerNameSQL(int mapID){  // WORKS
+        connectionDB();
+        String bestPlayer = "";
+
+        try {
+            Statement st = con.createStatement();
+
+            String selectBestPlayer = "SELECT l.firstname " +
+                    "FROM highscores AS s " +
+                    "INNER JOIN login AS l ON s.userID = l.userID " +
+                    "WHERE s.mapID = " + mapID + " " +
+                    "ORDER BY s.scores DESC " +
+                    "LIMIT 1;";
+            ResultSet rs = st.executeQuery(selectBestPlayer);
+
+            if (rs.next()) {
+                bestPlayer = rs.getString(1);
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return bestPlayer;
+    }
+
+    public int getUserID() {  // WORKS
+        connectionDB();
+
+        try {
+            Statement st = con.createStatement();
+
+            String selectUserID = "SELECT userID FROM login WHERE username = '" + username + "'";
+            ResultSet rs = st.executeQuery(selectUserID);
+
+            if (rs.next()) {
+                userID = rs.getInt(1);
+
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+        }
+
+        return userID;
     }
 
 }

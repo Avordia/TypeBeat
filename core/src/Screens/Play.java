@@ -77,9 +77,12 @@ public class Play extends ScreenAdapter {
     private final KeyHandling keyHandler;
     Score score;
     private AssetManager assetManager;
-    int musicID;
+    int mapID;
+    String username;
 
-    public Play(Game game, AssetManager assetManager,String tbpPath, String title) {
+    public Play(Game game, AssetManager assetManager,String tbpPath, String title,String username) {
+        this.game=game;
+        this.username=username;
         assetManager.get("Img/MapSprites/perfect.png", Texture.class);
         assetManager.get("Img/MapSprites/great.png", Texture.class);
         assetManager.get("Img/MapSprites/good.png", Texture.class);
@@ -123,7 +126,7 @@ public class Play extends ScreenAdapter {
         }
 
         spawnTimes.set(0,2.5f);
-        musicID= beatmapData.getMusicID();
+        mapID= beatmapData.getMusicID();
 
         wordList=new ArrayList<>();
         /*-------------------STRING BUILDER------------------------*/
@@ -383,8 +386,11 @@ public class Play extends ScreenAdapter {
         float logoAspectRatio= (float) logoPlay.getWidth() /logoPlay.getHeight();
 
         textBatch.draw(logoPlay,centerX- 100,screenHeight-120,200,200/logoAspectRatio);
-
         textBatch.end();
+
+        if(leftLine.isEmpty()){
+            game.setScreen(new ScoreScreen(game, score.getScore(), noteCount,username,mapID));
+        }
 
     }
 

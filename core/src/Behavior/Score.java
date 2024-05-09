@@ -1,7 +1,7 @@
 package Behavior;
 
 public class Score {
-    float score=0;
+    int score=0;
     int combo=1;
     int comboDisplay;
 
@@ -11,7 +11,7 @@ public class Score {
     }
 
     public String getScoreString(){
-        return String.format("%.0f", this.score);
+        return String.format(""+score);
     }
 
     public String getComboString(){
@@ -23,11 +23,14 @@ public class Score {
         combo=1;
     }
 
-    public void setScore(float score) {
+    public void setScore(int score) {
         this.score=this.score+score;
     }
 
     public void incrementCombo(){
         combo++;
+    }
+    public int getScore(){
+        return score;
     }
 }

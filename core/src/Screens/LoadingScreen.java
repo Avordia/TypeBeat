@@ -32,9 +32,11 @@ public class LoadingScreen extends ScreenAdapter {
     float elapsedTime;
     private String tbpPath;
     private String title;
+    String username;
 
-    public LoadingScreen(Game game, String tbpPath,String title) {
+    public LoadingScreen(Game game, String tbpPath,String title, String username) {
         this.game = game;
+        this.username=username;
         try {
             videoPlayer.play(backgroundVid);
         } catch (FileNotFoundException e) {
@@ -96,7 +98,7 @@ public class LoadingScreen extends ScreenAdapter {
         batch.end();
 
         if (assetManager.update() && elapsedTime>=2) {
-            game.setScreen(new Play(game, assetManager,tbpPath, title));
+            game.setScreen(new Play(game, assetManager,tbpPath, title,username));
         };
     }
 

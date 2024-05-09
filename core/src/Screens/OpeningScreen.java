@@ -16,9 +16,11 @@ public class OpeningScreen extends ScreenAdapter {
     private Texture javaTexture;
     private Image logoLibGDX;
     private Image logoJava;
+    String username;
 
     public OpeningScreen(Game game, String username) {
         this.game = game;
+        this.username=username;
     }
 
     @Override
@@ -59,7 +61,7 @@ public class OpeningScreen extends ScreenAdapter {
                 Actions.delay(holdDuration),
                 Actions.fadeOut(fadeOutDuration),
                 Actions.run(() -> {
-                    game.setScreen(new Menu(game));
+                    game.setScreen(new Menu(game,username));
                 })
         ));
 

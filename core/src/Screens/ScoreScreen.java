@@ -139,8 +139,16 @@ public class ScoreScreen extends ScreenAdapter {
         System.out.println("1 " + testUserScore);
         System.out.println("2 " + testBestScore);
         System.out.println("3 " + testBestPlayerScore);
+        System.out.println("4 " + userID);
+        System.out.println("5 function " + getUserID());
+
+        btnPlay = new Button(new TextureRegionDrawable(new TextureRegion(new Texture("Img/Buttons/Play0.png"))));
+        btnPlay.setSize(oW,oH);
         TextureRegionDrawable btnPlayN = new TextureRegionDrawable(new TextureRegion(buttonPlyS));
         TextureRegionDrawable btnPlayH = new TextureRegionDrawable(new TextureRegion(buttonPlyH));
+        btnPlay.getStyle().up=btnPlayN;
+        btnPlay.getStyle().down=btnPlayH;
+        btnPlay.setPosition(400, 200);
         stage.addActor(btnPlay);
         btnPlay.addListener(new ClickListener() {
             @Override
@@ -160,9 +168,12 @@ public class ScoreScreen extends ScreenAdapter {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 insertScore();
+                game.setScreen(new TrackSelection(game,username));
+                dispose();
             }
         });
         Gdx.input.setInputProcessor(stage);
+
     }
 
     @Override
@@ -198,9 +209,7 @@ public class ScoreScreen extends ScreenAdapter {
         batch.draw(logo,((float) Gdx.graphics.getWidth() /2)-((float) size /2), ((float) Gdx.graphics.getHeight() /2)-((float) size /2), size,size);
 
         /*----------------------------------------MGA TEST CASE--------------------------------*/
-        lblScore.draw(batch,"Test case: " + testBestPlayerScore,100,300); //1 // works
-        lblScore.draw(batch,"Test case: " + testBestScore,100,500); //2 // works
-        lblScore.draw(batch,"Test case: " + testUserScore,100, 600); //3 //!work
+
         /*----------------------------------------MGA TEST CASE--------------------------------*/
 
         batch.end();
@@ -250,7 +259,7 @@ public class ScoreScreen extends ScreenAdapter {
 
 
             if (rs.next()) {
-                userScore = rs.getInt("scores");
+                userScore = rs.getInt(1);
                 scoreString = String.valueOf(userScore);
 
             }
